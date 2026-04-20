@@ -53,8 +53,8 @@ Fx_zero_list = []
 Fz_zero_list = []
 
 for vel in velocities:
-    filename_bin = "C:/Users/jenny/OneDrive - NTNU/Master/Force measurements/Z_" + vel + "_1.bin"
-    filename_TST = "C:/Users/jenny/OneDrive - NTNU/Master/Force measurements/Z_" + vel + "_1.TST"
+    filename_bin = "Force measurements/Z_" + vel + "_1.bin"
+    filename_TST = "Force measurements/Z_" + vel + "_1.TST"
     time, water_speed, Fx, Fy, Fz, Mx, My, Mz = experiment_data(filename_bin, filename_TST)
     t, Fx, Fz = cut_timeseries(100, 200, time, Fx, Fz)
 
@@ -78,9 +78,47 @@ def cauchy_number(length, width, thickness, velocity, E):
     I = (width*thickness**3)/12
     Ca = 0.5* (rho*Cd*width*velocity**2*length**3)/(E*I)
     return float(Ca)
-    
+
 
 ###############################################################################
+# REPEATABILITY TEST
+###############################################################################
+
+config = "C" # S/C
+model = "W" # A/M/J/W
+speed = "7" # 3=0.3m/s
+
+Fx_mean = []
+Fx_max = []
+
+#Finding fx_zero works for all speeds except 0.03m/s
+Fx_zero = Fx_zero_list[int(speed)]
+#print(Fx_zero_list)
+#print(Fx_zero)
+
+#Looping through all 5 runs 
+for i in range(1, 6):
+    run = str(config)+"_"+str(model)+"_"+str(speed)+"_"+str(i)
+    filename_bin = "Force measurements/" + run + ".bin"
+    filename_TST = "Force measurements/" + run + ".TST"
+    
+    time, water_speed, Fx, Fy, Fz, Mx, My, Mz = experiment_data(filename_bin, filename_TST)
+    t, Fx, Fz = cut_timeseries(100, 200, time, Fx, Fz)
+
+    Fx_mean.append(np.mean(Fx)-Fx_zero)
+    Fx_max.append(np.max(Fx)-Fx_zero)   
+
+print(str(config)+"_"+str(model)+"_"+str(speed))
+print("Mean Fx:")
+for i in range(5):    
+    print(Fx_mean[i])
+print("Max Fx:")
+for i in range(5):    
+    print(Fx_max[i])
+
+    
+
+""" ###############################################################################
 # PLOT MEAN FX AND FZ FOR DIFFERENT FLOW VELOCITIES
 ###############################################################################
 
@@ -115,8 +153,8 @@ for config in config_list:
             Fz_zero = Fz_zero_list[i]
 
             run = str(config)+"_"+str(model_list[m])+"_"+str(velocities[i])+"_"+"1"
-            filename_bin = "C:/Users/jenny/OneDrive - NTNU/Master/Force measurements/" + run + ".bin"
-            filename_TST = "C:/Users/jenny/OneDrive - NTNU/Master/Force measurements/" + run + ".TST"
+            filename_bin = "Force measurements/" + run + ".bin"
+            filename_TST = "Force measurements/" + run + ".TST"
 
             time, water_speed, Fx, Fy, Fz, Mx, My, Mz = experiment_data(filename_bin, filename_TST)
             t, Fx, Fz = cut_timeseries(100, 200, time, Fx, Fz)
@@ -219,4 +257,4 @@ plt.xlabel("Ca")
 plt.ylabel("Cd")
 filepath = os.path.join("Plots", "CD_bulk_Cluster.png")
 plt.savefig(filepath, dpi=300)
-#plt.show()
+#plt.show() """
