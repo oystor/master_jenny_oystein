@@ -62,6 +62,8 @@ for vel in velocities:
     Fx_zero_list.append(np.mean(Fx))
     Fz_zero_list.append(np.mean(Fz))
 
+
+
 #plt.plot(velocities,Fx_zero)
 #plt.show()
 
@@ -81,7 +83,7 @@ def cauchy_number(length, width, thickness, velocity, E):
     return float(Ca)
     
 
-###############################################################################
+""" ###############################################################################
 # PLOT MEAN FX AND FZ FOR DIFFERENT FLOW VELOCITIES
 ###############################################################################
 
@@ -220,4 +222,4 @@ plt.xlabel("Ca")
 plt.ylabel("Cd")
 filepath = os.path.join("Plots", "CD_bulk_Cluster.png")
 plt.savefig(filepath, dpi=300)
-#plt.show()
+#plt.show() """
