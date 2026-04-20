@@ -81,7 +81,37 @@ def cauchy_number(length, width, thickness, velocity, E):
     I = (width*thickness**3)/12
     Ca = 0.5* (rho*Cd*width*velocity**2*length**3)/(E*I)
     return float(Ca)
-    
+
+###############################################################################
+# REPEATABIILITY
+###############################################################################
+
+config = "S" # S/C
+model = "J" # A/M/J/W
+speed = "3" # 3=0.3m/s
+Fx_zero = Fx_zero_list[int(speed)] 
+
+Fx_mean = []
+Fx_max = []
+
+#Looping through all 5 runs 
+for i in range(1, 6):
+    run = str(config)+"_"+str(model)+"_"+str(speed)+"_"+str(i)
+    filename_bin = "Force measurements/" + run + ".bin"
+    filename_TST = "Force measurements/" + run + ".TST"
+    time, water_speed, Fx, Fy, Fz, Mx, My, Mz = experiment_data(filename_bin, filename_TST)
+    t, Fx, Fz = cut_timeseries(100, 200, time, Fx, Fz)
+    Fx_mean.append(np.mean(Fx)-Fx_zero)
+    Fx_max.append(np.max(Fx)-Fx_zero)
+
+print(str(config)+"_"+str(model)+"_"+str(speed))
+print("Mean Fx:")
+for i in range(5):
+    print(Fx_mean[i])
+print("Max Fx:")
+for i in range(5):
+    print(Fx_max[i])
+
 
 """ ###############################################################################
 # PLOT MEAN FX AND FZ FOR DIFFERENT FLOW VELOCITIES
