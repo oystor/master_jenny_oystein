@@ -1,0 +1,27 @@
+CATMAN TEST FILE
+PATH=C:\Users\Hydrolab\Documents\HBM\catmanEasy\DATA\2026_MSc_Jenny_og_Oystein
+Version=catmanEasy university license
+Job name=Job1
+Data file with path=C:\Users\Hydrolab\Documents\HBM\catmanEasy\DATA\2026_MSc_Jenny_og_Oystein\Z_9_1.bin
+Data file=Z_9_1.bin
+DAQ project=2026_Msc_Jenny_og_Oystein.MEP
+File comment=
+Time zone=W. Europe Standard Time (UTC+1:00)
+Operator=
+Department=
+Comment=
+Default sample rate=200 Hz
+Slow sample rate=5 Hz
+Fast sample rate=2400 Hz
+Number of samples default sample rate=52284
+Number of samples slow sample rate=0
+Number of samples fast sample rate=0
+Saving mode=PROMPT
+Leader/Follower mode=Yes
+Start mode=Manual
+Start time=2026/03/17 14:03:42
+Stop mode=Manual
+Stop time=2026/03/17 14:08:04
+catmanEasy/AP version=5.5.3.13
+Numerical precision=8 Byte Float
+DATAFILE=C:\Users\Hydrolab\Documents\HBM\catmanEasy\DATA\2026_MSc_Jenny_og_Oystein\Z_9_1.bin
