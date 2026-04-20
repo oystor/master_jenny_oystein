@@ -52,6 +52,7 @@ velocities = ["03", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 Fx_zero_list = []
 Fz_zero_list = []
 
+
 for vel in velocities:
     filename_bin = "C:/Users/jenny/OneDrive - NTNU/Master/Force measurements/Z_" + vel + "_1.bin"
     filename_TST = "C:/Users/jenny/OneDrive - NTNU/Master/Force measurements/Z_" + vel + "_1.TST"
