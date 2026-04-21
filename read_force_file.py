@@ -56,6 +56,8 @@ Fz_zero_list = []
 for vel in velocities:
     filename_bin = "Force measurements/Z_" + vel + "_1.bin"
     filename_TST = "Force measurements/Z_" + vel + "_1.TST"
+    filename_bin = "Force_measurements/Z_" + vel + "_1.bin"
+    filename_TST = "Force_measurements/Z_" + vel + "_1.TST"
     time, water_speed, Fx, Fy, Fz, Mx, My, Mz = experiment_data(filename_bin, filename_TST)
     t, Fx, Fz = cut_timeseries(100, 200, time, Fx, Fz)
 
@@ -148,8 +150,8 @@ for config in config_list:
             Fz_zero = Fz_zero_list[i]
 
             run = str(config)+"_"+str(model_list[m])+"_"+str(velocities[i])+"_"+"1"
-            filename_bin = "Force measurements/" + run + ".bin"
-            filename_TST = "Force measurements/" + run + ".TST"
+            filename_bin = "Force_measurements/" + run + ".bin"
+            filename_TST = "Force_measurements/" + run + ".TST"
 
             time, water_speed, Fx, Fy, Fz, Mx, My, Mz = experiment_data(filename_bin, filename_TST)
             t, Fx, Fz = cut_timeseries(100, 200, time, Fx, Fz)
