@@ -2,6 +2,7 @@ import catmanreader as cr
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+from scipy.optimize import curve_fit
 
 def experiment_data(filename_bin, filename_TST):
     #Read file
@@ -86,7 +87,7 @@ def cauchy_number(length, width, thickness, velocity, E):
 # REPEATABIILITY
 ###############################################################################
 
-config = "S" # S/C
+""" config = "S" # S/C
 model = "J" # A/M/J/W
 speed = "3" # 3=0.3m/s
 Fx_zero = Fx_zero_list[int(speed)] 
@@ -110,10 +111,10 @@ for i in range(5):
     print(Fx_mean[i])
 print("Max Fx:")
 for i in range(5):
-    print(Fx_max[i])
+    print(Fx_max[i]) """
 
 
-""" ###############################################################################
+###############################################################################
 # PLOT MEAN FX AND FZ FOR DIFFERENT FLOW VELOCITIES
 ###############################################################################
 
@@ -170,17 +171,48 @@ for config in config_list:
             FxC_list.append(Fx_model)
             FzC_list.append(Fz_model)
             Cd_bulkC_list.append(Cd_model)
-            CaC_list.append(Ca_model)
+            CaC_list.append(Ca_model)   
 
-#Plots
 
+
+###############################################################################
+# FINNE VOGEL EXPONENT
+###############################################################################
+
+def power_func(x, a, b):
+    return a * x**b
+
+exponent_list = []
+curve_fit_list = []
+
+for i in range(len(model_list)):
+    params, covariance = curve_fit(power_func, U_list, FxC_list[i])
+    a, b = params
+    exponent_list.append(b)
+    curve_fit_list.append(power_func(U_list, a, b))
+#print("Exponents:", exponent_list)
+
+
+###############################################################################
+# PLOTS
+###############################################################################
+
+#Add origo to Fx list
+for i in range(len(FxS_list)):
+    FxS_list[i].insert(0, 0)
+    FxC_list[i].insert(0, 0)
+
+
+U_list_origo = np.append(U_list, 0)
+U_list_origo = np.sort(U_list_origo) 
 os.makedirs("Plots", exist_ok=True) 
 
 plt.figure(figsize=(9, 6)) 
-plt.plot(U_list, FxS_list[0], '.-', label="April")
-plt.plot(U_list, FxS_list[1], '.-', label="May")
-plt.plot(U_list, FxS_list[2], '.-', label="June")
-plt.plot(U_list, FxS_list[3], '.-', label="Wavy")
+plt.plot(U_list_origo, FxS_list[0], '.-', label="April")
+plt.plot(U_list_origo, FxS_list[1], '.-', label="May")
+plt.plot(U_list_origo, FxS_list[2], '.-', label="June")
+plt.plot(U_list_origo, FxS_list[3], '.-', label="Wavy")
+plt.plot(0, 0, 'ro')
 plt.legend()
 plt.title("Fx Single")
 plt.xlabel("Flow velocity [m/s]")
@@ -203,10 +235,16 @@ plt.savefig(filepath, dpi=300)
 #plt.show()
 
 plt.figure(figsize=(9, 6)) 
-plt.plot(U_list, FxC_list[0], '.-', label="April")
-plt.plot(U_list, FxC_list[1], '.-', label="May")
-plt.plot(U_list, FxC_list[2], '.-', label="June")
-plt.plot(U_list, FxC_list[3], '.-', label="Wavy")
+plt.plot(U_list_origo, FxC_list[0], '.-', color='blue', label="April")
+plt.plot(U_list_origo, FxC_list[1], '.-', color='orange', label="May")
+plt.plot(U_list_origo, FxC_list[2], '.-', color='green', label="June")
+plt.plot(U_list_origo, FxC_list[3], '.-', color='red', label="Wavy")
+
+plt.plot(U_list, curve_fit_list[0], '--', color='blue', label="Curve fit April")
+plt.plot(U_list, curve_fit_list[1], '--', color='orange', label="Curve fit May")
+plt.plot(U_list, curve_fit_list[2], '--', color='green', label="Curve fit June")
+plt.plot(U_list, curve_fit_list[3], '--', color='red', label="Curve fit Wavy")
+plt.plot(0, 0, 'ro')
 plt.legend()
 plt.title("Fx Cluster")
 plt.xlabel("Flow velocity [m/s]")
@@ -252,4 +290,4 @@ plt.xlabel("Ca")
 plt.ylabel("Cd")
 filepath = os.path.join("Plots", "CD_bulk_Cluster.png")
 plt.savefig(filepath, dpi=300)
-#plt.show() """
+#plt.show() 
