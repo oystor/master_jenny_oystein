@@ -92,7 +92,7 @@ def make_freq_spectrum(file, run):
 # Repeatability test
 ###############################################################################
 
-config = "S" # S/C
+""" config = "S" # S/C
 model = "J" # A/M/J/W
 speed = "3" # 3=0.3m/s
 
@@ -101,11 +101,11 @@ y_max = np.array([])
 #Looping through all 5 runs 
 for i in range(1, 6):
     run = str(config)+"_"+str(model)+"_"+str(speed)+"_"+str(i)
-    file = "C:/Users/jenny/OneDrive - NTNU/Master/Video/" + run + ".txt"
+    file = "video_data/" + run + ".txt"
     freq, y = make_freq_spectrum(file, run)
 
     freq_dominant = np.append(freq_dominant, float(freq))
     y_max = np.append(y_max, float(y))
 
 print(freq_dominant)
-print(y_max)
+print(y_max) """

@@ -43,4 +43,3 @@ def readfile_motion(filename):
   return t_arr, x_arr, y_arr
 
 
-#print(readfile_motion("C:/Users/jenny/OneDrive - NTNU/Master/Video/S_J_3_1.txt")[0])
