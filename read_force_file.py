@@ -78,7 +78,7 @@ def Cd_bulk(length, width, velocity, F_mean):
 
 def cauchy_number(length, width, thickness, velocity, E):
     rho = 1000
-    Cd = 2
+    Cd = 1.95
     I = (width*thickness**3)/12
     Ca = 0.5* (rho*Cd*width*velocity**2*length**3)/(E*I)
     return float(Ca)
@@ -124,6 +124,7 @@ model_list = ["A", "M", "J", "W"]
 lengths = np.array([31.55, 45.63, 53.93, 53.93]) * 10**(-2) # m
 widths = np.array([4.72, 6.54, 7.57, 7.57]) * 10**(-2) # m
 d = 0.8 * 10**(-3) # m (thickness)
+d_wavy = 1.2 * 10**(-3) # m (thickness for wavy model)
 E = 1.26 * 10**6 # Pa
 U_list = [0.03, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 
@@ -175,8 +176,16 @@ for config in config_list:
             Fx_model.append(np.mean(Fx)-Fx_zero)
             Fz_model.append(np.mean(Fz)-Fz_zero)
             
-            Cd_model.append(Cd_bulk(lengths[m], widths[m], U_list[i], np.mean(Fx)-Fx_zero))
-            Ca_model.append(cauchy_number(lengths[m], widths[m], d, U_list[i], E))
+            #Update thickness for wavy model
+            if m==3:
+                d = d_wavy
+            if config=="S":
+                Cd_model.append(Cd_bulk(lengths[m], widths[m], U_list[i], np.mean(Fx)-Fx_zero))
+                Ca_model.append(cauchy_number(lengths[m], widths[m], d, U_list[i], E))
+            else: 
+                # d = d*1.86 for cluster configuration
+                Cd_model.append(Cd_bulk(lengths[m], 3*widths[m], U_list[i], np.mean(Fx)-Fx_zero))
+                Ca_model.append(cauchy_number(lengths[m], 3*widths[m], d*1.86, U_list[i], E))
             
         if config=="S":
             FxS_list.append(Fx_model)
@@ -196,7 +205,7 @@ for config in config_list:
 # FINNE VOGEL EXPONENT
 ###############################################################################
 
-def power_func(x, a, b):
+""" def power_func(x, a, b):
     return a * x**b
 
 exponent_list = []
@@ -207,7 +216,7 @@ for i in range(len(model_list)):
     a, b = params
     exponent_list.append(b)
     curve_fit_list.append(power_func(U_list, a, b))
-print("Exponents:", exponent_list)
+print("Exponents:", exponent_list) """
 
 
 ###############################################################################
@@ -245,7 +254,8 @@ filepath = os.path.join("Plots", "Fx_Mean_Single.png")
 plt.savefig(filepath, dpi=300)
 #plt.show() """
 
-plt.figure(figsize=(10, 7)) 
+#subplots for single configuration
+""" plt.figure(figsize=(10, 7)) 
 plt.plot(U_list_origo, FxS_list[0], '.', color='blue', label="April")
 plt.plot(U_list, curve_fit_list[0], '--', color='blue', label="Curve fit April")
 plt.plot(0, 0, 'black', marker='o', label="Origo")
@@ -298,9 +308,11 @@ plt.xlabel("Flow velocity [m/s]")
 plt.ylabel("Drag force [N]")
 filepath = os.path.join("Plots", "Fx_Mean_Wavy.png")
 plt.savefig(filepath, dpi=300)
-plt.close()
+plt.close() """
 
-plt.figure(figsize=(10, 7)) 
+
+#Fz plots for single configuration
+""" plt.figure(figsize=(10, 7)) 
 plt.plot(U_list, FzS_list[0], '.-', label="April")
 plt.plot(U_list, FzS_list[1], '.-', label="May")
 plt.plot(U_list, FzS_list[2], '.-', label="June")
@@ -312,19 +324,20 @@ plt.xlabel("Flow velocity [m/s]")
 plt.ylabel("Mean Force [N]")
 filepath = os.path.join("Plots", "Fz_Mean_Single.png")
 plt.savefig(filepath, dpi=300)
-#plt.show()
+#plt.show() """
 
-plt.figure(figsize=(9, 6)) 
+#Fx plots for cluster configuration
+""" plt.figure(figsize=(9, 6)) 
 plt.plot(U_list_origo, FxC_list[0], '.', color='blue', label="April")
 plt.plot(U_list_origo, FxC_list[1], '.', color='orange', label="May")
 plt.plot(U_list_origo, FxC_list[2], '.', color='green', label="June")
 plt.plot(U_list_origo, FxC_list[3], '.', color='red', label="Wavy")
 
-""" plt.plot(U_list, curve_fit_list[0], '--', color='blue', label="Curve fit April")
+ plt.plot(U_list, curve_fit_list[0], '--', color='blue', label="Curve fit April")
 plt.plot(U_list, curve_fit_list[1], '--', color='orange', label="Curve fit May")
 plt.plot(U_list, curve_fit_list[2], '--', color='green', label="Curve fit June")
 plt.plot(U_list, curve_fit_list[3], '--', color='red', label="Curve fit Wavy")
- """
+
 plt.plot(0, 0, 'black', marker='o', label="Origo")
 plt.legend()
 plt.grid()
@@ -333,9 +346,10 @@ plt.xlabel("Flow velocity [m/s]")
 plt.ylabel("Drag force [N]")
 filepath = os.path.join("Plots", "Fx_Mean_Cluster.png")
 plt.savefig(filepath, dpi=300)
-#plt.show()
+#plt.show() """
 
-plt.figure(figsize=(9, 6)) 
+#Fz plots for cluster configuration
+""" plt.figure(figsize=(9, 6)) 
 plt.plot(U_list, FzC_list[0], '.-', label="April")
 plt.plot(U_list, FzC_list[1], '.-', label="May")
 plt.plot(U_list, FzC_list[2], '.-', label="June")
@@ -347,32 +361,32 @@ plt.xlabel("Flow velocity [m/s]")
 plt.ylabel("Mean Force [N]")
 filepath = os.path.join("Plots", "Fz_Mean_Cluster.png")
 plt.savefig(filepath, dpi=300)
-#plt.show()
+#plt.show() """
 
 plt.figure(figsize=(9, 6)) 
-plt.plot(CaS_list[0][1:], Cd_bulkS_list[0][1:], '.-', label="April")
-plt.plot(CaS_list[1][1:], Cd_bulkS_list[1][1:], '.-', label="May")
-plt.plot(CaS_list[2][1:], Cd_bulkS_list[2][1:], '.-', label="June")
-plt.plot(CaS_list[3][1:], Cd_bulkS_list[3][1:], '.-', label="Wavy")
+plt.plot(CaS_list[0][1:], Cd_bulkS_list[0][1:], '.--', label="April")
+plt.plot(CaS_list[1][1:], Cd_bulkS_list[1][1:], '.--', label="May")
+plt.plot(CaS_list[2][1:], Cd_bulkS_list[2][1:], '.--', label="June")
+plt.plot(CaS_list[3][1:], Cd_bulkS_list[3][1:], '.--', label="Wavy")
 plt.legend()
 plt.grid()
 plt.title("Single")
-plt.xlabel("Ca")
-plt.ylabel("Cd")
-filepath = os.path.join("Plots", "CD_bulk_Single.png")
+plt.xlabel(r"$Ca$", fontsize=16)
+plt.ylabel(r"$C_{D,bulk}$", fontsize=16)
+filepath = os.path.join("Plots", "CD_bulk_Single_new.png")
 plt.savefig(filepath, dpi=300)
 #plt.show()
-
+#[1:]
 plt.figure(figsize=(9, 6)) 
-plt.plot(CaC_list[0][1:], Cd_bulkC_list[0][1:], '.-', label="April")
-plt.plot(CaC_list[1][1:], Cd_bulkC_list[1][1:], '.-', label="May")
-plt.plot(CaC_list[2][1:], Cd_bulkC_list[2][1:], '.-', label="June")
-plt.plot(CaC_list[3][1:], Cd_bulkC_list[3][1:], '.-', label="Wavy")
+plt.plot(CaC_list[0][1:], Cd_bulkC_list[0][1:], '.--', label="April")
+plt.plot(CaC_list[1][1:], Cd_bulkC_list[1][1:], '.--', label="May")
+plt.plot(CaC_list[2][1:], Cd_bulkC_list[2][1:], '.--', label="June")
+plt.plot(CaC_list[3][1:], Cd_bulkC_list[3][1:], '.--', label="Wavy")
 plt.legend()
 plt.grid()
 plt.title("Cluster")
 plt.xlabel("Ca")
 plt.ylabel("Cd")
-filepath = os.path.join("Plots", "CD_bulk_Cluster.png")
+filepath = os.path.join("Plots", "CD_bulk_Cluster_new.png")
 plt.savefig(filepath, dpi=300)
 #plt.show() 
