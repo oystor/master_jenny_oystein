@@ -24,8 +24,8 @@ for vel in velocities:
 
 
 config = "S" # S/C
-model = "J" # A/M/J/W
-speed = "3" # 3=0.3m/s
+model = "W" # A/M/J/W
+speed = "6" # 3=0.3 m/s
 
 run = str(config)+"_"+str(model)+"_"+str(speed)+"_1"
 filename_bin = "Force measurements/" + run + ".bin"
@@ -36,6 +36,7 @@ time, Fx, Fz = cut_timeseries(100, 200, time, Fx, Fz)
 Fz = Fz - Fz_zero_list[int(speed)] # Subtract zero value from Fz
 
 fs = 200 # Sampling frequency Hz
+Fz = Fz - np.mean(Fz) # Remove mean from Fz to focus on oscillations
 
 # FFT
 N = len(Fz)
@@ -47,9 +48,11 @@ mask = freqs >= 0
 freqs = freqs[mask]
 fft_vals = fft_vals[mask]
 
+print("Dominant frequency: ", freqs[np.argmax(fft_vals)], "Hz")
 
+plt.figure(figsize=(9, 6)) 
 plt.plot(freqs, fft_vals)
-plt.xlabel("Frekvens (Hz)")
-plt.ylabel("Amplitude")
-plt.title("Frekvensspekter")
+plt.xlabel("Frequency (Hz)")
+plt.ylabel('Magnitude')
+plt.title('Frequency spectrum '+run, fontsize=18)
 plt.show()

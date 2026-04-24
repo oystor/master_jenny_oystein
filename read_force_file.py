@@ -363,7 +363,7 @@ filepath = os.path.join("Plots", "Fz_Mean_Cluster.png")
 plt.savefig(filepath, dpi=300)
 #plt.show() """
 
-plt.figure(figsize=(9, 6)) 
+""" plt.figure(figsize=(9, 6)) 
 plt.plot(CaS_list[0][1:], Cd_bulkS_list[0][1:], '.--', label="April")
 plt.plot(CaS_list[1][1:], Cd_bulkS_list[1][1:], '.--', label="May")
 plt.plot(CaS_list[2][1:], Cd_bulkS_list[2][1:], '.--', label="June")
@@ -389,4 +389,4 @@ plt.xlabel("Ca")
 plt.ylabel("Cd")
 filepath = os.path.join("Plots", "CD_bulk_Cluster_new.png")
 plt.savefig(filepath, dpi=300)
-#plt.show() 
+#plt.show() """ 
