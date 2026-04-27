@@ -15,11 +15,15 @@ def readfile_motion(filename):
   y_arr = np.array([])
 
   def clean_number(s):
+        if isinstance(s, float):
+            return s
         s = s.strip()
         s = s.replace('−', '-')  
         s = s.replace('–', '-')   
         s = s.replace('—', '-')   
         s = re.sub(r"[^\d\.\-Ee+]", "", s)
+        if not s or s == '.' or s == '-':
+            return math.nan
         return float(s)
 
   #skip header line and split by comma before setting correct numbers together to update list
