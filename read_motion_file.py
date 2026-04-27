@@ -15,13 +15,14 @@ def readfile_motion(filename):
   y_arr = np.array([])
 
   def clean_number(s):
-        s = s.strip()
-        s = s.replace('−', '-')  
-        s = s.replace('–', '-')   
-        s = s.replace('—', '-')   
-        s = re.sub(r"[^\d\.\-Ee+]", "", s)
+        if isinstance(s, str)==True:
+          s = s.strip()
+          s = s.replace('−', '-')  
+          s = s.replace('–', '-')   
+          s = s.replace('—', '-')   
+          s = re.sub(r"[^\d\.\-Ee+]", "", s)
         return float(s)
-
+ 
   #skip header line and split by comma before setting correct numbers together to update list
   for line in lines[2:]:
       parts = line.strip().split(",")
@@ -38,7 +39,7 @@ def readfile_motion(filename):
         y = math.nan
       elif len(parts)==6:
         y = parts[4] + "." + parts[5]
-      
+     
       #add values to arrays
       t_arr = np.append(t_arr, t)
       x_arr = np.append(x_arr, clean_number(x))
