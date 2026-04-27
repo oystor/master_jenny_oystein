@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 import scipy.signal as signal
 import os
 
-def make_freq_spectrum(file, run):
+def make_freq_spectrum(file, run, config):
 
-    time, x, y = readfile_motion(file)
+    time, x, y = readfile_motion(file, config)
 
     # fill missing y values with interpolation
     nans = np.isnan(y)
@@ -28,6 +28,10 @@ def make_freq_spectrum(file, run):
     
     #filtered values 
     filtered_values = highpass_filter(y_values, cutoff_freq=0.1, sample_rate=fs)
+
+    #add hann window to reduce spectral leakage
+    #window = np.hanning(len(y_values))
+    #y_values = y_values * window
 
     #FFT (rfft for real-valued input)
     X = np.fft.rfft(y_values)
@@ -96,9 +100,9 @@ def make_freq_spectrum(file, run):
 # Repeatability test
 ###############################################################################
 
-config = "S" # S/C
-model = "M" # A/M/J/W
-speed = "5" # 3=0.3m/s
+config = "C" # S/C
+model = "W" # A/M/J/W
+speed = "7" # 3=0.3m/s
 
 freq_dominant = np.array([])
 y_max = np.array([])
@@ -106,7 +110,7 @@ y_max = np.array([])
 for i in range(1, 6):
     run = str(config)+"_"+str(model)+"_"+str(speed)+"_"+str(i)
     file = "master_jenny_oystein/video_data/" + run + ".txt"
-    freq, y = make_freq_spectrum(file, run)
+    freq, y = make_freq_spectrum(file, run, config)
 
     freq_dominant = np.append(freq_dominant, float(freq))
     y_max = np.append(y_max, float(y))
