@@ -97,8 +97,8 @@ def make_freq_spectrum(file, run):
 ###############################################################################
 
 config = "S" # S/C
-model = "A" # A/M/J/W
-speed = "6" # 3=0.3m/s
+model = "M" # A/M/J/W
+speed = "5" # 3=0.3m/s
 
 freq_dominant = np.array([])
 y_max = np.array([])

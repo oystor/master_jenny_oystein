@@ -30,16 +30,16 @@ def readfile_motion(filename):
       t = float(parts[0] + "." + parts[1])
       
       #If data is missing at some timesteps
-      if len(parts)==3:
+      if len(parts)==4:
         x = math.nan
-      elif len(parts)>=4:
+      elif len(parts)>4:
         x = parts[2] + "." + parts[3]
       
       if len(parts)==5:
         y = math.nan
       elif len(parts)==6:
         y = parts[4] + "." + parts[5]
-     
+      
       #add values to arrays
       t_arr = np.append(t_arr, t)
       x_arr = np.append(x_arr, clean_number(x))
