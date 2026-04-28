@@ -29,10 +29,6 @@ def make_freq_spectrum(file, run, config):
     #filtered values 
     filtered_values = highpass_filter(y_values, cutoff_freq=0.1, sample_rate=fs)
 
-    #add hann window to reduce spectral leakage
-    #window = np.hanning(len(y_values))
-    #y_values = y_values * window
-
     #FFT (rfft for real-valued input)
     X = np.fft.rfft(y_values)
     X_filtered = np.fft.rfft(filtered_values)

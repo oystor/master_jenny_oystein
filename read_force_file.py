@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 from scipy.optimize import curve_fit
+from plot_loads import get_numerical_loads
 
 def experiment_data(filename_bin, filename_TST):
     #Read file
@@ -63,7 +64,7 @@ for vel in velocities:
     Fx_zero_list.append(np.mean(Fx))
     Fz_zero_list.append(np.mean(Fz))
 
-
+Fx_zero_list = [0, 0,0,0,0,0,0,0,0,0] # Set zero values to 0 for numerical comparison
 
 #plt.plot(velocities,Fx_zero)
 #plt.show()
@@ -218,6 +219,37 @@ for i in range(len(model_list)):
     curve_fit_list.append(power_func(U_list, a, b))
 print("Exponents:", exponent_list) """
 
+###############################################################################
+# NUMERICAL LOADS
+###############################################################################
+
+config = "C" # S/C
+#model = "A" # A/M/J/W
+model_list = ["A", "M"]
+#speed = "7" # 3=0.3m/s
+velocities = ["03", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+
+""" FxS_num = []
+for model in model_list:
+    Fx_mean_model_list = []
+    #Looping through all vlelocities for the given config and model 
+    for i in range(len(velocities)):
+        run = str(config)+"_"+str(model)+"_"+str(velocities[i])
+        filename = "master_jenny_oystein/results_num/" + str(config)+"_"+str(model)+ "/" + run + ".h5"
+        time, loadx, loadz, loadx_mean = get_numerical_loads(filename)
+        Fx_mean_model_list.append(loadx_mean)
+    FxS_num.append(Fx_mean_model_list) """
+
+FxC_num = []
+for model in model_list:
+    Fx_mean_model_list = []
+    #Looping through all vlelocities for the given config and model 
+    for i in range(len(velocities)):
+        run = str(config)+"_"+str(model)+"_"+str(velocities[i])
+        filename = "master_jenny_oystein/results_num/" + str(config)+"_"+str(model)+ "/" + run + ".h5"
+        time, loadx, loadz, loadx_mean = get_numerical_loads(filename)
+        Fx_mean_model_list.append(loadx_mean)
+    FxC_num.append(Fx_mean_model_list) 
 
 ###############################################################################
 # PLOTS
@@ -233,7 +265,8 @@ U_list_origo = np.append(U_list, 0)
 U_list_origo = np.sort(U_list_origo) 
 os.makedirs("Plots", exist_ok=True) 
 
-""" plt.figure(figsize=(9, 6)) 
+""" #Fx mean plots for single configuration
+plt.figure(figsize=(9, 6)) 
 plt.plot(U_list_origo, FxS_list[0], '.-', label="April")
 plt.plot(U_list_origo, FxS_list[1], '.-', label="May")
 plt.plot(U_list_origo, FxS_list[2], '.-', label="June")
@@ -252,12 +285,13 @@ plt.xlabel("Flow velocity [m/s]")
 plt.ylabel("Drag force [N]")
 filepath = os.path.join("Plots", "Fx_Mean_Single.png")
 plt.savefig(filepath, dpi=300)
-#plt.show() """
+#plt.show()  """
 
-#subplots for single configuration
-""" plt.figure(figsize=(10, 7)) 
+""" #subplots for single configuration
+plt.figure(figsize=(10, 7)) 
 plt.plot(U_list_origo, FxS_list[0], '.', color='blue', label="April")
-plt.plot(U_list, curve_fit_list[0], '--', color='blue', label="Curve fit April")
+plt.plot(U_list, FxS_num[0], '-', color='blue', label="April Numerical")
+#plt.plot(U_list, curve_fit_list[0], '--', color='blue', label="Curve fit April")
 plt.plot(0, 0, 'black', marker='o', label="Origo")
 plt.legend()
 plt.grid()
@@ -271,7 +305,8 @@ plt.close()
 
 plt.figure(figsize=(10, 7)) 
 plt.plot(U_list_origo, FxS_list[1], '.', color='orange', label="May")
-plt.plot(U_list, curve_fit_list[1], '--', color='orange', label="Curve fit May")
+plt.plot(U_list, FxS_num[1], '-', color='orange', label="May Numerical")
+#plt.plot(U_list, curve_fit_list[1], '--', color='orange', label="Curve fit May")
 plt.plot(0, 0, 'black', marker='o', label="Origo")
 plt.legend()
 plt.grid()
@@ -285,7 +320,8 @@ plt.close()
 
 plt.figure(figsize=(10, 7)) 
 plt.plot(U_list_origo, FxS_list[2], '.', color='green', label="June")
-plt.plot(U_list, curve_fit_list[2], '--', color='green', label="Curve fit June")
+plt.plot(U_list, FxS_num[2], '-', color='green', label="June Numerical")
+#plt.plot(U_list, curve_fit_list[2], '--', color='green', label="Curve fit June")
 plt.plot(0, 0, 'black', marker='o', label="Origo")
 plt.legend()
 plt.grid()
@@ -299,7 +335,7 @@ plt.close()
 
 plt.figure(figsize=(10, 7)) 
 plt.plot(U_list_origo, FxS_list[3], '.', color='red', label="Wavy")
-plt.plot(U_list, curve_fit_list[3], '--', color='red', label="Curve fit Wavy")
+#plt.plot(U_list, curve_fit_list[3], '--', color='red', label="Curve fit Wavy")
 plt.plot(0, 0, 'black', marker='o', label="Origo")
 plt.legend()
 plt.grid()
@@ -307,6 +343,51 @@ plt.title("Wavy")
 plt.xlabel("Flow velocity [m/s]")
 plt.ylabel("Drag force [N]")
 filepath = os.path.join("Plots", "Fx_Mean_Wavy.png")
+plt.savefig(filepath, dpi=300)
+plt.close() """
+
+#subplots for cluster configuration
+plt.figure(figsize=(10, 7)) 
+plt.plot(U_list_origo, FxC_list[0], '.', color='blue', label="April")
+plt.plot(U_list, FxC_num[0], '-', color='blue', label="April Numerical")
+#plt.plot(U_list, curve_fit_list[0], '--', color='blue', label="Curve fit April")
+plt.plot(0, 0, 'black', marker='o', label="Origo")
+plt.legend()
+plt.grid()
+plt.title("April Cluster")
+plt.xlabel("Flow velocity [m/s]")
+plt.ylabel("Drag force [N]")
+filepath = os.path.join("Plots", "Fx_Mean_April_Cluster.png")
+plt.savefig(filepath, dpi=300)
+plt.close()
+
+
+plt.figure(figsize=(10, 7)) 
+plt.plot(U_list_origo, FxC_list[1], '.', color='orange', label="May")
+plt.plot(U_list, FxC_num[1], '-', color='orange', label="May Numerical")
+#plt.plot(U_list, curve_fit_list[1], '--', color='orange', label="Curve fit May")
+plt.plot(0, 0, 'black', marker='o', label="Origo")
+plt.legend()
+plt.grid()
+plt.title("May Cluster")
+plt.xlabel("Flow velocity [m/s]")
+plt.ylabel("Drag force [N]")
+filepath = os.path.join("Plots", "Fx_Mean_May_Cluster.png")
+plt.savefig(filepath, dpi=300)
+plt.close()
+
+
+""" plt.figure(figsize=(10, 7)) 
+plt.plot(U_list_origo, FxC_list[2], '.', color='green', label="June")
+plt.plot(U_list, FxC_num[2], '-', color='green', label="June Numerical")
+#plt.plot(U_list, curve_fit_list[2], '--', color='green', label="Curve fit June")
+plt.plot(0, 0, 'black', marker='o', label="Origo")
+plt.legend()
+plt.grid()
+plt.title("June CLuster")
+plt.xlabel("Flow velocity [m/s]")
+plt.ylabel("Drag force [N]")
+filepath = os.path.join("Plots", "Fx_Mean_June_Cluster.png")
 plt.savefig(filepath, dpi=300)
 plt.close() """
 
@@ -363,6 +444,7 @@ filepath = os.path.join("Plots", "Fz_Mean_Cluster.png")
 plt.savefig(filepath, dpi=300)
 #plt.show() """
 
+#Cd_bulk plots 
 """ plt.figure(figsize=(9, 6)) 
 plt.plot(CaS_list[0][1:], Cd_bulkS_list[0][1:], '.--', label="April")
 plt.plot(CaS_list[1][1:], Cd_bulkS_list[1][1:], '.--', label="May")

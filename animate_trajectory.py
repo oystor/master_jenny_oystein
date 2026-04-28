@@ -13,7 +13,7 @@ def read(hdf5file, group, dataset):
     with h5py.File(hdf5file, "r") as f:
         return np.array(f[group][dataset][()])
 
-input_file = "structure.h5"
+input_file = "master_jenny_oystein\numerical_results\S_A\S_A_2.h5"
 
 if not os.path.exists(input_file):
     print("The file " + input_file + " does not exist!\nPlease check again!\n")

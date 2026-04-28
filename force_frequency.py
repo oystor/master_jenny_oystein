@@ -24,7 +24,7 @@ for vel in velocities:
 
 
 config = "S" # S/C
-model = "W" # A/M/J/W
+model = "M" # A/M/J/W
 speed = "6" # 3=0.3 m/s
 
 run = str(config)+"_"+str(model)+"_"+str(speed)+"_1"

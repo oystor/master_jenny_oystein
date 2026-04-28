@@ -4,7 +4,7 @@ import numpy as np
 config_list = ["S", "C"] 
 model_list = ["A", "M", "J", "W"]
 #model_list = ["W"]
-lengths = np.array([31.55, 45.63, 53.93, 53.93]) * 10**(-2) # m
+lengths = np.array([31.55, 45.63, 53.93, 53.93]) * 10**(-2) # m 
 widths = np.array([4.72, 6.54, 7.57, 7.57]) * 10**(-2) # m
 d = 0.8 * 10**(-3) # m (thickness)
 d_wavy = 1.2 * 10**(-3) # m (thickness for wavy model)
