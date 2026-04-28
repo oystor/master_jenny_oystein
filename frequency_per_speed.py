@@ -38,17 +38,20 @@ def make_freq_spectrum_with_speeds(config, model, speeds):
             return signal.filtfilt(b, a, data)  
         
         #Sample rate 
+            #sample rate
+        dt = np.mean(np.diff(time))
+        fs = 1 / dt
 
-        filtered_values = highpass_filter(y_values, cutoff_freq=0.1, sample_rate=60)
+        filtered_values = highpass_filter(y_values, cutoff_freq=0.1, sample_rate=fs)
 
-        X = np.fft.fft(y_values)
+        X = np.fft.rfft(y_values)
 
         X_mag = np.abs(X)
         X_mags.append(X_mag)
 
         #Dominant frequency [Hz] and max y [m]
         #freq_dominant = np.round(np.argmax(X_mag) * 60 / y_values.size,2)
-        freq = np.fft.fftfreq(y_values.size, d=1/60)
+        freq = np.fft.rfftfreq(y_values.size, d=1/60)
         freqs.append(freq)
 
         freq_dominant = np.round(freq[np.argmax(X_mag[1:]) + 1], 2)
@@ -160,17 +163,19 @@ def make_freq_spectrum_with_configs(config, models, speed):
             return signal.filtfilt(b, a, data)  
         
         #Sample rate 
+        dt = np.mean(np.diff(time))
+        fs = 1 / dt
 
-        filtered_values = highpass_filter(y_values, cutoff_freq=0.1, sample_rate=60)
+        filtered_values = highpass_filter(y_values, cutoff_freq=0.1, sample_rate=fs)
 
-        X = np.fft.fft(y_values)
+        X = np.fft.rfft(y_values)
 
         X_mag = np.abs(X)
         X_mags.append(X_mag)
 
         #Dominant frequency [Hz] and max y [m]
         #freq_dominant = np.round(np.argmax(X_mag) * 60 / y_values.size,2)
-        freq = np.fft.fftfreq(y_values.size, d=1/60)
+        freq = np.fft.rfftfreq(y_values.size, d=1/60)
         freqs.append(freq)
 
         freq_dominant = np.round(freq[np.argmax(X_mag[1:]) + 1], 2)
@@ -250,21 +255,33 @@ def make_freq_spectrum_with_configs(config, models, speed):
     return freq_dominants, y_maxs
 
 
+def freq_plot_multiple_speeds(config, model, speeds):
+    freq_dominants_all = []
+    y_maxs_all = []
+    for speed in speeds:
+        freq_dominants, y_maxs = make_freq_spectrum_with_speeds(config, model, speed)  
+        freq_dominants_all.append(freq_dominants)
+        y_maxs_all.append(y_maxs)
+    
+    #Plotting dominant frequencies vs speeds
+    plt.figure(figsize=(9, 6))
+    plt.plot(speeds, freq_dominants_all, 'k-', marker='o')
+    plt.xlabel('Speed', fontsize=18)
+    plt.ylabel('Dominant Frequency (Hz)', fontsize=18)
+    plt.title(f'Dominant Frequency vs Speed for {config}_{model}', fontsize=18)
+    plt.grid()
+    plt.savefig(f"Dominant_Frequency_vs_Speed_{config}_{model}.png", dpi=300)
+    plt.close()
 
-config = "S" # S/C
-model = "M" # A/M/J/W
-speeds = ["2", "3", "4", "5", "6", "7", "8"]
 
-freq_dominants, y_maxs = make_freq_spectrum_with_speeds(config, model, speeds)  
+all_configs = ["S", "C"]
+all_models = ["A", "M", "J", "W"]
+all_speeds = ["03", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
-print(f"Dominant frequencies for {config}_{model}: ", freq_dominants)
-print(f"Max y values for {config}_{model}: ", y_maxs)
-
-config = "S" # S/C
-models =  ["A", "M", "J", "W"] # A/M/J/W
+for model in all_models[:3]:
+    freq_plot_multiple_speeds("S", model, all_speeds[2:9])
 
 
-for speed in speeds:
-    freq_dominants, y_maxs = make_freq_spectrum_with_configs(config, models, speed)  
+
 
 
