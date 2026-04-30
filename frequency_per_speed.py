@@ -19,8 +19,8 @@ def make_freq_spectrum_with_speeds(config, model, speeds):
     for i in range(0, len(speeds)):
         run = str(config)+"_"+str(model)+"_"+str(speeds[i])+"_"+str(1)
         print(run)
-        file = "video_data/" + run + ".txt"
-        time, x, y = readfile_motion(file)
+        file = "master_jenny_oystein/video_data/"+run+".txt"
+        time, x, y = readfile_motion(file, config)
         times.append(time)
         xs.append(x)
         ys.append(y)
@@ -42,16 +42,22 @@ def make_freq_spectrum_with_speeds(config, model, speeds):
         dt = np.mean(np.diff(time))
         fs = 1 / dt
 
-        filtered_values = highpass_filter(y_values, cutoff_freq=0.1, sample_rate=fs)
+        #Decide cutoff frequency bades on flowspeed
+        if i<5:
+            cutoff_freq = 0.1
+        else:            
+            cutoff_freq = 0.5
+
+        #Filtered values
+        filtered_values = highpass_filter(y_values, cutoff_freq, sample_rate=fs)
 
         X = np.fft.rfft(y_values)
-
         X_mag = np.abs(X)
         X_mags.append(X_mag)
 
         #Dominant frequency [Hz] and max y [m]
         #freq_dominant = np.round(np.argmax(X_mag) * 60 / y_values.size,2)
-        freq = np.fft.rfftfreq(y_values.size, d=1/60)
+        freq = np.fft.rfftfreq(y_values.size, dt)
         freqs.append(freq)
 
         freq_dominant = np.round(freq[np.argmax(X_mag[1:]) + 1], 2)
@@ -65,12 +71,8 @@ def make_freq_spectrum_with_speeds(config, model, speeds):
         X_filtered_mag = np.abs(X_filtered)
         X_filtered_mags.append(X_filtered_mag)
 
-
-
-
         freq_filtered = np.abs(np.fft.fftfreq(filtered_values.size, d=1/60))
         freq_filtereds.append(freq_filtered)
-
 
 
         #PLOTS time series filtered
@@ -275,7 +277,7 @@ def freq_plot_multiple_speeds(config, model, speeds):
 
 
 all_configs = ["S", "C"]
-all_models = ["A", "M", "J", "W"]
+all_models = ["A", "M", "J", "W"] # 
 all_speeds = ["03", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
 for model in all_models[:3]:

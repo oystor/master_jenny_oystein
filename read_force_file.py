@@ -225,13 +225,14 @@ print("Exponents:", exponent_list) """
 # NUMERICAL LOADS
 ###############################################################################
 
-config = "C" # S/C
+""" config = "C" # S/C
 #model = "A" # A/M/J/W
 model_list = ["A", "M"]
 #speed = "7" # 3=0.3m/s
 velocities = ["03", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
-""" FxS_num = []
+""" 
+"""FxS_num = []
 for model in model_list:
     Fx_mean_model_list = []
     #Looping through all vlelocities for the given config and model 
@@ -241,7 +242,7 @@ for model in model_list:
         time, loadx, loadz, loadx_mean = get_numerical_loads(filename)
         Fx_mean_model_list.append(loadx_mean)
     FxS_num.append(Fx_mean_model_list) """
-
+"""
 FxC_num = []
 for model in model_list:
     Fx_mean_model_list = []
@@ -251,7 +252,7 @@ for model in model_list:
         filename = "master_jenny_oystein/results_num/" + str(config)+"_"+str(model)+ "/" + run + ".h5"
         time, loadx, loadz, loadx_mean = get_numerical_loads(filename)
         Fx_mean_model_list.append(loadx_mean)
-    FxC_num.append(Fx_mean_model_list) 
+    FxC_num.append(Fx_mean_model_list)  """
 
 ###############################################################################
 # PLOTS
@@ -348,7 +349,7 @@ filepath = os.path.join("Plots", "Fx_Mean_Wavy.png")
 plt.savefig(filepath, dpi=300)
 plt.close() """
 
-#subplots for cluster configuration
+""" #subplots for cluster configuration
 plt.figure(figsize=(10, 7)) 
 plt.plot(U_list_origo, FxC_list[0], '.', color='blue', label="April")
 plt.plot(U_list, FxC_num[0], '-', color='blue', label="April Numerical")
@@ -376,7 +377,7 @@ plt.xlabel("Flow velocity [m/s]")
 plt.ylabel("Drag force [N]")
 filepath = os.path.join("Plots", "Fx_Mean_May_Cluster.png")
 plt.savefig(filepath, dpi=300)
-plt.close()
+plt.close() """
 
 
 """ plt.figure(figsize=(10, 7)) 
