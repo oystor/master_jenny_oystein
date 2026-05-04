@@ -56,17 +56,15 @@ Fz_zero_list = []
 
 
 for vel in velocities:
-    filename_bin = "Force measurements/Z_" + vel + "_1.bin"
-    filename_TST = "Force measurements/Z_" + vel + "_1.TST"
-    filename_bin = "Force_measurements/Z_" + vel + "_1.bin"
-    filename_TST = "Force_measurements/Z_" + vel + "_1.TST"
+    filename_bin = "./Force_measurements/Z_" + vel + "_1.bin"
+    filename_TST = "./Force_measurements/Z_" + vel + "_1.TST"
     time, water_speed, Fx, Fy, Fz, Mx, My, Mz = experiment_data(filename_bin, filename_TST)
     t, Fx, Fz = cut_timeseries(100, 200, time, Fx, Fz)
 
     Fx_zero_list.append(np.mean(Fx))
     Fz_zero_list.append(np.mean(Fz))
 
-Fx_zero_list = [0, 0,0,0,0,0,0,0,0,0] # Set zero values to 0 for numerical comparison
+#Fx_zero_list = [0, 0,0,0,0,0,0,0,0,0] # Set zero values to 0 for numerical comparison
 
 #plt.plot(velocities,Fx_zero)
 #plt.show()
@@ -155,8 +153,8 @@ for config in config_list:
 
             run = str(config)+"_"+str(model_list[m])+"_"+str(velocities[i])+"_"+"1"
             run2 = str(config)+"_"+str(model_list[m])+"_"+str(velocities[i])+"_"+"2"
-            filename_bin = "Force measurements/" + run + ".bin"
-            filename_TST = "Force measurements/" + run + ".TST"
+            filename_bin = "Force_measurements/" + run + ".bin"
+            filename_TST = "Force_measurements/" + run + ".TST"
 
             #Calculate mean of all 5 runs for repeated runs, otherwise just use the single run
             if os.path.isfile("Force measurements/" + run2 + ".bin"):
@@ -164,8 +162,8 @@ for config in config_list:
                 Fz_runs = []
                 for j in range(1, 6):
                     run = str(config)+"_"+str(model_list[m])+"_"+str(velocities[i])+"_"+str(j)
-                    filename_bin = "Force measurements/" + run + ".bin"
-                    filename_TST = "Force measurements/" + run + ".TST"
+                    filename_bin = "Force_measurements/" + run + ".bin"
+                    filename_TST = "Force_measurements/" + run + ".TST"
                     time, water_speed, Fx, Fy, Fz, Mx, My, Mz = experiment_data(filename_bin, filename_TST)
                     t, Fx, Fz = cut_timeseries(100, 200, time, Fx, Fz)
                     Fx_runs.append(np.mean(Fx))
@@ -227,9 +225,11 @@ print("Exponents:", exponent_list) """
 
 """ config = "C" # S/C
 #model = "A" # A/M/J/W
-model_list = ["A", "M"]
+model_list = ["M"]
 #speed = "7" # 3=0.3m/s
 velocities = ["03", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+CMs = ["01", "0102", "02", "03", "04", "06", "08", "10"]
+CM_choice = 1
 
 """ 
 """FxS_num = []
@@ -237,24 +237,41 @@ for model in model_list:
     Fx_mean_model_list = []
     #Looping through all vlelocities for the given config and model 
     for i in range(len(velocities)):
-        run = str(config)+"_"+str(model)+"_"+str(velocities[i])
-        filename = "master_jenny_oystein/results_num/" + str(config)+"_"+str(model)+ "/" + run + ".h5"
+        if config == "S" and model == "J" and CMs[CM_choice] == "03":
+            run = str(config)+"_"+str(model)+"_"+str(velocities[i])+"_"+CMs[CM_choice]
+        elif config == "S" and model == "W" and CMs[CM_choice] == "03":
+            run = str(config)+"_"+str(model)+"_"+str(velocities[i])+"_"+CMs[CM_choice]
+        else:            
+            if float(velocities[i]) < 4:
+                run = str(config)+"_"+str(model)+"_"+str(velocities[i])+"_"+"10"
+            else:
+                run = str(config)+"_"+str(model)+"_"+str(velocities[i])+"_"+CMs[CM_choice]
+        filename = "correct_results_num/" + str(config)+"_"+str(model)+ "/" + run + ".h5"
         time, loadx, loadz, loadx_mean = get_numerical_loads(filename)
         Fx_mean_model_list.append(loadx_mean)
-    FxS_num.append(Fx_mean_model_list) """
-"""
+    FxS_num.append(Fx_mean_model_list)  """
+ 
+
 FxC_num = []
 for model in model_list:
     Fx_mean_model_list = []
     #Looping through all vlelocities for the given config and model 
     for i in range(len(velocities)):
-        run = str(config)+"_"+str(model)+"_"+str(velocities[i])
-        filename = "master_jenny_oystein/results_num/" + str(config)+"_"+str(model)+ "/" + run + ".h5"
+        if config == "C" and model == "A" and CMs[CM_choice] == "01":
+            run = str(config)+"_"+str(model)+"_"+str(velocities[i])+"_"+CMs[CM_choice]
+        elif config == "C" and model == "M" and CMs[CM_choice] == "0102":
+            run = str(config)+"_"+str(model)+"_"+str(velocities[i])+"_"+CMs[CM_choice]
+        else:
+            if float(velocities[i]) < 4:
+                run = str(config)+"_"+str(model)+"_"+str(velocities[i])+"_"+"10"
+            else:
+                run = str(config)+"_"+str(model)+"_"+str(velocities[i])+"_"+CMs[CM_choice]
+        filename = "correct_results_num/" + str(config)+"_"+str(model)+ "/" + run + ".h5"
         time, loadx, loadz, loadx_mean = get_numerical_loads(filename)
         Fx_mean_model_list.append(loadx_mean)
-    FxC_num.append(Fx_mean_model_list)  """
+    FxC_num.append(Fx_mean_model_list)   
 
-###############################################################################
+#####################################################ß##########################
 # PLOTS
 ###############################################################################
 
@@ -289,23 +306,24 @@ plt.ylabel("Drag force [N]")
 filepath = os.path.join("Plots", "Fx_Mean_Single.png")
 plt.savefig(filepath, dpi=300)
 #plt.show()  """
-
-""" #subplots for single configuration
+"""
+#subplots for single configuration
 plt.figure(figsize=(10, 7)) 
-plt.plot(U_list_origo, FxS_list[0], '.', color='blue', label="April")
-plt.plot(U_list, FxS_num[0], '-', color='blue', label="April Numerical")
+plt.plot(U_list_origo, FxS_list[0], 'D', color='blue', label="April")
+plt.plot(U_list, FxS_num[0], ls="dashed", marker=".", color='blue', label="April Numerical")
 #plt.plot(U_list, curve_fit_list[0], '--', color='blue', label="Curve fit April")
 plt.plot(0, 0, 'black', marker='o', label="Origo")
 plt.legend()
 plt.grid()
-plt.title("April")
+plt.title("Single blade - April, with C_M: " + CMs[CM_choice])
 plt.xlabel("Flow velocity [m/s]")
 plt.ylabel("Drag force [N]")
-filepath = os.path.join("Plots", "Fx_Mean_April.png")
+savename = "Fx_Mean_Single_April_CM_" + CMs[CM_choice] + ".png"
+filepath = os.path.join("Plots", savename)
 plt.savefig(filepath, dpi=300)
-plt.close()
+plt.close()"""
 
-
+"""
 plt.figure(figsize=(10, 7)) 
 plt.plot(U_list_origo, FxS_list[1], '.', color='orange', label="May")
 plt.plot(U_list, FxS_num[1], '-', color='orange', label="May Numerical")
@@ -334,60 +352,80 @@ plt.ylabel("Drag force [N]")
 filepath = os.path.join("Plots", "Fx_Mean_June.png")
 plt.savefig(filepath, dpi=300)
 plt.close()
-
-
+"""
+"""
+#subplots for single configuration
 plt.figure(figsize=(10, 7)) 
-plt.plot(U_list_origo, FxS_list[3], '.', color='red', label="Wavy")
+plt.plot(U_list_origo, FxS_list[2], 'D', color='blue', label="June Experimental")
+plt.plot(U_list, FxS_num[0], ls="dashed", marker=".", color='blue', label="June Numerical")
+#plt.plot(U_list, curve_fit_list[2], '--', color='blue', label="Curve fit June")
+plt.plot(0, 0, 'black', marker='o', label="Origo")
+plt.legend()
+plt.grid()
+plt.title("Single blade - June, with C_M: " + CMs[CM_choice])
+plt.xlabel("Flow velocity [m/s]")
+plt.ylabel("Drag force [N]")
+savename = "Fx_Mean_Single_June_CM_" + CMs[CM_choice] + ".png"
+filepath = os.path.join("Plots", savename)
+plt.savefig(filepath, dpi=300)
+plt.close()
+"""
+""" plt.figure(figsize=(10, 7)) 
+plt.plot(U_list_origo, FxS_list[3], 'D', color='red', label="Wavy Experimental")
+plt.plot(U_list, FxS_num[0], ls="dashed", marker=".", color='red', label="Wavy Numerical")
 #plt.plot(U_list, curve_fit_list[3], '--', color='red', label="Curve fit Wavy")
 plt.plot(0, 0, 'black', marker='o', label="Origo")
 plt.legend()
 plt.grid()
-plt.title("Wavy")
+plt.title("Single blade - Wavy with C_M: " + CMs[CM_choice])
 plt.xlabel("Flow velocity [m/s]")
 plt.ylabel("Drag force [N]")
-filepath = os.path.join("Plots", "Fx_Mean_Wavy.png")
+savename = "Fx_Mean_Single_Wavy_CM_" + CMs[CM_choice] + ".png"
+filepath = os.path.join("Plots", savename)
 plt.savefig(filepath, dpi=300)
-plt.close() """
+plt.close()  """
 
 """ #subplots for cluster configuration
 plt.figure(figsize=(10, 7)) 
-plt.plot(U_list_origo, FxC_list[0], '.', color='blue', label="April")
-plt.plot(U_list, FxC_num[0], '-', color='blue', label="April Numerical")
+plt.plot(U_list_origo, FxC_list[0], 'D', color='blue', label="April")
+plt.plot(U_list, FxC_num[0], ls='dashed', marker=".", color='blue', label="April Numerical")
 #plt.plot(U_list, curve_fit_list[0], '--', color='blue', label="Curve fit April")
 plt.plot(0, 0, 'black', marker='o', label="Origo")
 plt.legend()
 plt.grid()
-plt.title("April Cluster")
+plt.title("Cluster - April, with C_M: " + CMs[CM_choice])
 plt.xlabel("Flow velocity [m/s]")
 plt.ylabel("Drag force [N]")
-filepath = os.path.join("Plots", "Fx_Mean_April_Cluster.png")
-plt.savefig(filepath, dpi=300)
-plt.close()
+savename = "Fx_Mean_Cluster_April_CM_" + CMs[CM_choice] + ".png"
+filepath = os.path.join("Plots", savename)
+plt.savefig(filepath, dpi=600)
+plt.close() """
 
 
 plt.figure(figsize=(10, 7)) 
-plt.plot(U_list_origo, FxC_list[1], '.', color='orange', label="May")
-plt.plot(U_list, FxC_num[1], '-', color='orange', label="May Numerical")
+plt.plot(U_list_origo, FxC_list[1], marker='D', color='orange', label="May")
+plt.plot(U_list, FxC_num[0], ls='dashed', marker=".", color='orange', label="May Numerical")
 #plt.plot(U_list, curve_fit_list[1], '--', color='orange', label="Curve fit May")
 plt.plot(0, 0, 'black', marker='o', label="Origo")
 plt.legend()
 plt.grid()
-plt.title("May Cluster")
+plt.title("Cluster - May, with C_M: " + CMs[CM_choice])
 plt.xlabel("Flow velocity [m/s]")
 plt.ylabel("Drag force [N]")
-filepath = os.path.join("Plots", "Fx_Mean_May_Cluster.png")
+savename = "Fx_Mean_Cluster_May_CM_" + CMs[CM_choice] + ".png"
+filepath = os.path.join("Plots", savename)
 plt.savefig(filepath, dpi=300)
-plt.close() """
+plt.close()
+"""
 
-
-""" plt.figure(figsize=(10, 7)) 
+plt.figure(figsize=(10, 7)) 
 plt.plot(U_list_origo, FxC_list[2], '.', color='green', label="June")
 plt.plot(U_list, FxC_num[2], '-', color='green', label="June Numerical")
 #plt.plot(U_list, curve_fit_list[2], '--', color='green', label="Curve fit June")
 plt.plot(0, 0, 'black', marker='o', label="Origo")
 plt.legend()
 plt.grid()
-plt.title("June CLuster")
+plt.title("June Cluster")
 plt.xlabel("Flow velocity [m/s]")
 plt.ylabel("Drag force [N]")
 filepath = os.path.join("Plots", "Fx_Mean_June_Cluster.png")
