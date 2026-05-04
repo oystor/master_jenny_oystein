@@ -56,7 +56,7 @@ def unpack_long(filecontent, filepos):
     :return: read long and new filepos
     '''
     newpos = filepos + 4
-    shortval, = struct.unpack("l", filecontent[filepos: newpos])
+    shortval, = struct.unpack("i", filecontent[filepos: newpos])
     return shortval, newpos
 
 
