@@ -223,7 +223,7 @@ print("Exponents:", exponent_list) """
 # NUMERICAL LOADS
 ###############################################################################
 
-""" config = "C" # S/C
+config = "C" # S/C
 #model = "A" # A/M/J/W
 model_list = ["M"]
 #speed = "7" # 3=0.3m/s
@@ -231,7 +231,7 @@ velocities = ["03", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 CMs = ["01", "0102", "02", "03", "04", "06", "08", "10"]
 CM_choice = 1
 
-""" 
+
 """FxS_num = []
 for model in model_list:
     Fx_mean_model_list = []
