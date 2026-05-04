@@ -1,6 +1,8 @@
 import re
 import numpy as np
 import math
+import matplotlib.pyplot as plt
+import os
 
 def readfile_motion(filename, config):
   #reads txt file with time, x and y values, returns lists
@@ -58,4 +60,15 @@ def readfile_motion(filename, config):
       y_arr = np.append(y_arr, clean_number(y))
   return t_arr, x_arr, y_arr
 
+t, x_arr, y = readfile_motion("master_jenny_oystein/video_data/S_J_5_1.txt", "S")
+y_values = y - np.nanmean(y)
 
+plt.figure(figsize=(9, 6)) 
+plt.plot(t, y_values)
+plt.grid()
+plt.title("Time series Single June 0.5 m/s", fontsize=16)
+plt.xlabel("Time [s]")
+plt.ylabel("Displacement [m]")
+os.makedirs("Plots", exist_ok=True) 
+filepath = os.path.join("Plots", "timeseries_example_S_J_5.png")
+plt.savefig(filepath, dpi=300)

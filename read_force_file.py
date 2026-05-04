@@ -56,10 +56,10 @@ Fz_zero_list = []
 
 
 for vel in velocities:
-    filename_bin = "Force measurements/Z_" + vel + "_1.bin"
-    filename_TST = "Force measurements/Z_" + vel + "_1.TST"
-    filename_bin = "Force_measurements/Z_" + vel + "_1.bin"
-    filename_TST = "Force_measurements/Z_" + vel + "_1.TST"
+    filename_bin = "master_jenny_oystein/Force measurements/Z_" + vel + "_1.bin"
+    filename_TST = "master_jenny_oystein/Force measurements/Z_" + vel + "_1.TST"
+    filename_bin = "master_jenny_oystein/Force_measurements/Z_" + vel + "_1.bin"
+    filename_TST = "master_jenny_oystein/Force_measurements/Z_" + vel + "_1.TST"
     time, water_speed, Fx, Fy, Fz, Mx, My, Mz = experiment_data(filename_bin, filename_TST)
     t, Fx, Fz = cut_timeseries(100, 200, time, Fx, Fz)
 
@@ -448,11 +448,11 @@ plt.savefig(filepath, dpi=300)
 #plt.show() """
 
 #Cd_bulk plots 
-""" plt.figure(figsize=(9, 6)) 
-plt.plot(CaS_list[0][1:], Cd_bulkS_list[0][1:], '.--', label="April")
-plt.plot(CaS_list[1][1:], Cd_bulkS_list[1][1:], '.--', label="May")
-plt.plot(CaS_list[2][1:], Cd_bulkS_list[2][1:], '.--', label="June")
-plt.plot(CaS_list[3][1:], Cd_bulkS_list[3][1:], '.--', label="Wavy")
+plt.figure(figsize=(9, 6)) 
+plt.plot(CaS_list[0][2:], Cd_bulkS_list[0][2:], '.--', label="April")
+plt.plot(CaS_list[1][2:], Cd_bulkS_list[1][2:], '.--', label="May")
+plt.plot(CaS_list[2][2:], Cd_bulkS_list[2][2:], '.--', label="June")
+plt.plot(CaS_list[3][2:], Cd_bulkS_list[3][2:], '.--', label="Wavy")
 plt.legend()
 plt.grid()
 plt.title("Single")
@@ -463,10 +463,10 @@ plt.savefig(filepath, dpi=300)
 #plt.show()
 #[1:]
 plt.figure(figsize=(9, 6)) 
-plt.plot(CaC_list[0][1:], Cd_bulkC_list[0][1:], '.--', label="April")
-plt.plot(CaC_list[1][1:], Cd_bulkC_list[1][1:], '.--', label="May")
-plt.plot(CaC_list[2][1:], Cd_bulkC_list[2][1:], '.--', label="June")
-plt.plot(CaC_list[3][1:], Cd_bulkC_list[3][1:], '.--', label="Wavy")
+plt.plot(CaC_list[0][2:], Cd_bulkC_list[0][2:], '.--', label="April")
+plt.plot(CaC_list[1][2:], Cd_bulkC_list[1][2:], '.--', label="May")
+plt.plot(CaC_list[2][2:], Cd_bulkC_list[2][2:], '.--', label="June")
+plt.plot(CaC_list[3][2:], Cd_bulkC_list[3][2:], '.--', label="Wavy")
 plt.legend()
 plt.grid()
 plt.title("Cluster")
@@ -474,4 +474,4 @@ plt.xlabel("Ca")
 plt.ylabel("Cd")
 filepath = os.path.join("Plots", "CD_bulk_Cluster_new.png")
 plt.savefig(filepath, dpi=300)
-#plt.show() """ 
+#plt.show()  

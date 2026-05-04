@@ -19,15 +19,9 @@ def make_freq_spectrum(file, run, config, cutoff_freq):
     dt = np.mean(np.diff(time))
     fs = 1 / dt
 
-    #filter
-    def highpass_filter(data, cutoff_freq, sample_rate, order=5):
-        nyquist = sample_rate / 2
-        normal_cutoff = cutoff_freq / nyquist
-        b, a = signal.butter(order, normal_cutoff, btype='high', analog=False)
-        return signal.filtfilt(b, a, data)  
-    
-    #filtered values 
-    filtered_values = highpass_filter(y_values, cutoff_freq, sample_rate=fs)
+    #filtering with a high-pass Butterworth filter to remove low-frequency drift
+    b, a = signal.butter(5, cutoff_freq, btype='high', fs=fs)
+    filtered_values = signal.filtfilt(b, a, y_values)
 
     #FFT (rfft for real-valued input)
     X = np.fft.rfft(y_values)
@@ -134,12 +128,12 @@ for i in range(5):
 ###############################################################################
 
 config = "C" # S/C
-model = "M" # A/M/J/W
+model = "A" # A/M/J/W
 #speed = "3" # 3=0.3 m/s
 #cutoff_freq = 0.1 # Hz (to remove low-frequency drift)
 
-speeds = ["3", "4", "5", "6", "7", "8", "9"]
-vel = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+speeds = ["3", "4", "5", "6", "7", "8"] 
+vel = [ 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
 
 # freq_dominant, y_max, freq_dominant_filtered, freq, X_mag, X_filtered_mag = make_freq_spectrum(file, run, config, cutoff_freq)
 
@@ -157,8 +151,8 @@ for speed in speeds:
     run = str(config)+"_"+str(model)+"_"+str(speed)+"_1"
     file = "master_jenny_oystein/video_data/" + run + ".txt"
 
-    if int(speed) < 5:
-        cutoff_freq = 0.5
+    if int(speed) < 7:
+        cutoff_freq = 1
     else:
         cutoff_freq = 1
     #print(cutoff_freq)
@@ -185,38 +179,63 @@ plt.savefig(filepath, dpi=300)
 plt.close() """
 
 
-
+#Filtered spectrum 
 os.makedirs("Spectrums_comparison_filtered", exist_ok=True) 
-for i in range(len(speeds)):
+for i in range(len(speeds)): 
+    plt.figure(figsize=(10, 6)) 
     plt.plot(freq_list[i], X_filtered_mag_list[i], label = "0."+speeds[i]+" m/s")
     plt.legend()    
-    plt.xlim(0, 7)
-    plt.xlabel('Frequency (Hz)', fontsize=14)
-    plt.ylabel('Magnitude', fontsize=14)
+    plt.xlim(0, 10) 
+    plt.xlabel('Frequency (Hz)', fontsize=14) 
+    plt.ylabel('Magnitude', fontsize=14) 
     plt.grid()
-    plt.title("Frequency spectrum Cluster May "+ "0."+speeds[i]+" m/s", fontsize=16)
+    plt.title("Frequency spectrum Cluster April "+ "0."+speeds[i]+" m/s", fontsize=16)
 
     filepath = os.path.join("Spectrums_comparison_filtered", "spectrum_filtered_values_"+str(config)+"_"+str(model)+"_"+str(speeds[i])+".png")
     plt.savefig(filepath, dpi=300)
     plt.close()
 
-print("Dominant frequencies unfiltered:")
+#Print frequencies
+""" print("Dominant frequencies unfiltered:")
 print(freq_dominant_list)
 #print("Dominant frequencies filtered:")
 #print(freq_dominant_filtered_list)
-
+"""
 print("Dominant frequency filtered:")
 for i in range(len(speeds)):
-    print(freq_dominant_filtered_list[i])
+    print(freq_dominant_filtered_list[i]) 
 
-
-plt.plot(vel, freq_dominant_filtered_list)   
+#Dominant frequencies vs velocity
+""" plt.plot(vel, freq_dominant_filtered_list)   
 plt.ylabel('Frequency (Hz)', fontsize=14)
 plt.xlabel('Current velocity [m/s]', fontsize=14)
 plt.grid()
-plt.title("Dominant frequency Cluster May", fontsize=16)
+plt.title("Dominant frequency Cluster Wavy", fontsize=16)
 
 #os.makedirs("Spectrums_comparison", exist_ok=True) 
 filepath = os.path.join("Spectrums_comparison_filtered", "dominant frequency_"+str(config)+"_"+str(model)+".png")
 plt.savefig(filepath, dpi=300)
+plt.close() """
+
+
+""" #Plot max amplitude vs velocity
+os.makedirs("Flutter_Amplitude", exist_ok=True) 
+plt.figure(figsize=(10, 6))
+plt.plot(vel, y_max_list)
+plt.ylabel('Flutter amplitude [m]', fontsize=14)
+plt.xlabel('Current velocity [m/s]', fontsize=14)
+#plt.legend()    
+#plt.xlim(0, 7)
+plt.xlabel('Current velocity [m/s]', fontsize=14)
+plt.ylabel('Amplitude (m)', fontsize=14)
+plt.grid()
+plt.title("Max Amplitude Cluster April", fontsize=16)
+
+filepath = os.path.join("Flutter_Amplitude", "amplitude_"+str(config)+"_"+str(model)+".png")
+plt.savefig(filepath, dpi=300)
 plt.close()
+
+#Print amplitudes
+print("Amplitudes:")
+for i in range(len(speeds)):
+    print(y_max_list[i]) """
