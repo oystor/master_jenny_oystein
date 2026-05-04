@@ -16,7 +16,7 @@ def get_numerical_loads(input_file):
     Nn    = int(read(input_file, "TrussSystem", "number_node")[0])
     t     = t[:, 0]
     steps = t.size
-
+    print("Number of seconds: ", steps/60)
     loads = np.zeros((steps, 2))
     for i in range(steps):
         load = read(input_file, "TrussSystem", "Load_{:d}".format(i))
@@ -43,7 +43,7 @@ for model in model_list:
     #Looping through all vlelocities for the given config and model 
     for i in range(len(velocities)):
         run = str(config)+"_"+str(model)+"_"+str(velocities[i])
-        filename = "master_jenny_oystein/results_num/" + str(config)+"_"+str(model)+ "/" + run + ".h5"
+        filename = "results_num/" + str(config)+"_"+str(model)+ "/" + run + ".h5"
         time, loadx, loadz, loadx_mean = get_numerical_loads(filename)
         Fx_mean_model_list.append(loadx_mean)
         #print(f"Run: {run}, loadx_mean: {loadx_mean}")

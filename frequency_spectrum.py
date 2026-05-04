@@ -105,7 +105,7 @@ y_max = np.array([])
 #Looping through all 5 runs 
 for i in range(1, 6):
     run = str(config)+"_"+str(model)+"_"+str(speed)+"_"+str(i)
-    file = "master_jenny_oystein/video_data/" + run + ".txt"
+    file = "video_data/" + run + ".txt"
     freq, y = make_freq_spectrum(file, run, config)
 
     freq_dominant = np.append(freq_dominant, float(freq))

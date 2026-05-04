@@ -20,7 +20,7 @@ def make_freq_spectrum_with_speeds(config, model, speeds):
         run = str(config)+"_"+str(model)+"_"+str(speeds[i])+"_"+str(1)
         print(run)
         file = "video_data/" + run + ".txt"
-        time, x, y = readfile_motion(file)
+        time, x, y = readfile_motion(file, config)
         times.append(time)
         xs.append(x)
         ys.append(y)
@@ -145,7 +145,7 @@ def make_freq_spectrum_with_configs(config, models, speed):
         run = str(config)+"_"+str(models[i])+"_"+str(speed)+"_"+str(1)
         print(run)
         file = "video_data/" + run + ".txt"
-        time, x, y = readfile_motion(file)
+        time, x, y = readfile_motion(file, config)
         times.append(time)
         xs.append(x)
         ys.append(y)
