@@ -167,7 +167,8 @@ for speed in speeds:
     freq_dominant_list.append(freq_dominant)
     freq_dominant_filtered_list.append(freq_dominant_filtered)
     y_max_list.append(y_max) 
- 
+
+os.makedirs("Spectrums_comparison_filtered", exist_ok=True) 
 
 #Unfiltered spectrum
 """ for i in range(len(speeds)):
@@ -245,6 +246,8 @@ print("Amplitudes:")
 for i in range(len(speeds)):
     print(y_max_list[i]) """
 
+
+#Smoothed frequency spectrums
 plt.figure(figsize=(8,5))
 
 for i, speed in enumerate(speeds):
@@ -262,4 +265,6 @@ plt.ylabel("Normalised smoothed magnitude")
 plt.title("Smoothed frequency spectra Single June")
 plt.legend()
 plt.grid(True)
-plt.show()
+filepath = os.path.join("Spectrums_comparison_filtered", "spectrum_filtered_values_"+str(config)+"_"+str(model)+"_"+str(speeds[i])+".png")
+plt.savefig(filepath, dpi=300)
+plt.close() 
