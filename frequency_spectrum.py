@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
 import os
+from scipy.ndimage import gaussian_filter1d
+from scipy.signal import savgol_filter
 
 def make_freq_spectrum(file, run, config, cutoff_freq):
 
@@ -87,6 +89,7 @@ def make_freq_spectrum(file, run, config, cutoff_freq):
 
     return freq_dominant, y_max, freq_dominant_filtered, freq, X_mag, X_filtered_mag
 
+
 ###############################################################################
 # Repeatability test
 ###############################################################################
@@ -127,13 +130,13 @@ for i in range(5):
 # Compare speeds (frequency cpectrums)
 ###############################################################################
 
-config = "C" # S/C
-model = "A" # A/M/J/W
+config = "S" # S/C
+model = "J" # A/M/J/W
 #speed = "3" # 3=0.3 m/s
 #cutoff_freq = 0.1 # Hz (to remove low-frequency drift)
 
-speeds = ["3", "4", "5", "6", "7", "8"] 
-vel = [ 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
+speeds = ["3", "4", "5", "6", "7", "8", "9"] 
+vel = [ 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 
 # freq_dominant, y_max, freq_dominant_filtered, freq, X_mag, X_filtered_mag = make_freq_spectrum(file, run, config, cutoff_freq)
 
@@ -157,12 +160,14 @@ for speed in speeds:
         cutoff_freq = 1
     #print(cutoff_freq)
     freq_dominant, y_max, freq_dominant_filtered, freq, X_mag, X_filtered_mag = make_freq_spectrum(file, run, config, cutoff_freq)
+    
     freq_list.append(freq)
     X_mag_list.append(X_mag)
     X_filtered_mag_list.append(X_filtered_mag)
     freq_dominant_list.append(freq_dominant)
     freq_dominant_filtered_list.append(freq_dominant_filtered)
-    y_max_list.append(y_max)   
+    y_max_list.append(y_max) 
+ 
 
 #Unfiltered spectrum
 """ for i in range(len(speeds)):
@@ -180,7 +185,7 @@ plt.close() """
 
 
 #Filtered spectrum 
-os.makedirs("Spectrums_comparison_filtered", exist_ok=True) 
+""" os.makedirs("Spectrums_comparison_filtered", exist_ok=True) 
 for i in range(len(speeds)): 
     plt.figure(figsize=(10, 6)) 
     plt.plot(freq_list[i], X_filtered_mag_list[i], label = "0."+speeds[i]+" m/s")
@@ -193,7 +198,7 @@ for i in range(len(speeds)):
 
     filepath = os.path.join("Spectrums_comparison_filtered", "spectrum_filtered_values_"+str(config)+"_"+str(model)+"_"+str(speeds[i])+".png")
     plt.savefig(filepath, dpi=300)
-    plt.close()
+    plt.close() """
 
 #Print frequencies
 """ print("Dominant frequencies unfiltered:")
@@ -239,3 +244,22 @@ plt.close()
 print("Amplitudes:")
 for i in range(len(speeds)):
     print(y_max_list[i]) """
+
+plt.figure(figsize=(8,5))
+
+for i, speed in enumerate(speeds):
+    freq = freq_list[i]
+    X = X_filtered_mag_list[i]
+
+    X_norm = X / np.max(X)
+    X_smooth = gaussian_filter1d(X_norm, sigma=20)
+
+    plt.plot(freq, X_smooth, label=f"{vel[i]} m/s")
+
+plt.xlim(0, 10)
+plt.xlabel("Frequency [Hz]")
+plt.ylabel("Normalised smoothed magnitude")
+plt.title("Smoothed frequency spectra Single June")
+plt.legend()
+plt.grid(True)
+plt.show()

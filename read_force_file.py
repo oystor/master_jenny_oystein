@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 from scipy.optimize import curve_fit
-from plot_loads import get_numerical_loads
+#from plot_loads import get_numerical_loads
 
 def experiment_data(filename_bin, filename_TST):
     #Read file
@@ -56,8 +56,8 @@ Fz_zero_list = []
 
 
 for vel in velocities:
-    filename_bin = "./Force_measurements/Z_" + vel + "_1.bin"
-    filename_TST = "./Force_measurements/Z_" + vel + "_1.TST"
+    filename_bin = "master_jenny_oystein/Force_measurements/Z_" + vel + "_1.bin"
+    filename_TST = "master_jenny_oystein/Force_measurements/Z_" + vel + "_1.TST"
     time, water_speed, Fx, Fy, Fz, Mx, My, Mz = experiment_data(filename_bin, filename_TST)
     t, Fx, Fz = cut_timeseries(100, 200, time, Fx, Fz)
 
@@ -121,12 +121,15 @@ for i in range(5):
 
 config_list = ["S", "C"] 
 model_list = ["A", "M", "J", "W"]
-#model_list = ["W"]
-lengths = np.array([31.55, 45.63, 53.93, 53.93]) * 10**(-2) # m
-widths = np.array([4.72, 6.54, 7.57, 7.57]) * 10**(-2) # m
-d = 0.8 * 10**(-3) # m (thickness)
-d_wavy = 1.2 * 10**(-3) # m (thickness for wavy model)
+
+#Dimensions of the models
+lengths = [0.3014, 0.437, 0.5142, 0.5208] # m
+widths = [0.046, 0.063, 0.0728, 0.073] # m
+d = [0.000849, 0.000953, 0.000903, 0.001449] # m (thickness)
+rho = [850, 754, 852, 1159] # kg/m^3 (density)    
 E = 1.26 * 10**6 # Pa
+t_c = 1.86 # cluster thickness parameter
+
 U_list = [0.03, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 
 
@@ -153,17 +156,17 @@ for config in config_list:
 
             run = str(config)+"_"+str(model_list[m])+"_"+str(velocities[i])+"_"+"1"
             run2 = str(config)+"_"+str(model_list[m])+"_"+str(velocities[i])+"_"+"2"
-            filename_bin = "Force_measurements/" + run + ".bin"
-            filename_TST = "Force_measurements/" + run + ".TST"
+            filename_bin = "master_jenny_oystein/Force_measurements/" + run + ".bin"
+            filename_TST = "master_jenny_oystein/Force_measurements/" + run + ".TST"
 
             #Calculate mean of all 5 runs for repeated runs, otherwise just use the single run
-            if os.path.isfile("Force measurements/" + run2 + ".bin"):
+            if os.path.isfile("master_jenny_oystein/Force measurements/" + run2 + ".bin"):
                 Fx_runs = []
                 Fz_runs = []
                 for j in range(1, 6):
                     run = str(config)+"_"+str(model_list[m])+"_"+str(velocities[i])+"_"+str(j)
-                    filename_bin = "Force_measurements/" + run + ".bin"
-                    filename_TST = "Force_measurements/" + run + ".TST"
+                    filename_bin = "master_jenny_oystein/Force_measurements/" + run + ".bin"
+                    filename_TST = "master_jenny_oystein/Force_measurements/" + run + ".TST"
                     time, water_speed, Fx, Fy, Fz, Mx, My, Mz = experiment_data(filename_bin, filename_TST)
                     t, Fx, Fz = cut_timeseries(100, 200, time, Fx, Fz)
                     Fx_runs.append(np.mean(Fx))
@@ -177,16 +180,14 @@ for config in config_list:
             Fx_model.append(np.mean(Fx)-Fx_zero)
             Fz_model.append(np.mean(Fz)-Fz_zero)
             
-            #Update thickness for wavy model
-            if m==3:
-                d = d_wavy
+            #Calculate Cd_bulk and Cauchy number for each run
             if config=="S":
                 Cd_model.append(Cd_bulk(lengths[m], widths[m], U_list[i], np.mean(Fx)-Fx_zero))
-                Ca_model.append(cauchy_number(lengths[m], widths[m], d, U_list[i], E))
+                Ca_model.append(cauchy_number(lengths[m], widths[m], d[m], U_list[i], E))
             else: 
-                # d = d*1.86 for cluster configuration
+                # d = d*1.86 for cluster configuration and w = 3*w
                 Cd_model.append(Cd_bulk(lengths[m], 3*widths[m], U_list[i], np.mean(Fx)-Fx_zero))
-                Ca_model.append(cauchy_number(lengths[m], 3*widths[m], d*1.86, U_list[i], E))
+                Ca_model.append(cauchy_number(lengths[m], 3*widths[m], d[m]*t_c, U_list[i], E))
             
         if config=="S":
             FxS_list.append(Fx_model)
@@ -199,6 +200,7 @@ for config in config_list:
             FzC_list.append(Fz_model)
             Cd_bulkC_list.append(Cd_model)
             CaC_list.append(Ca_model)   
+
 
 
 
@@ -223,13 +225,13 @@ print("Exponents:", exponent_list) """
 # NUMERICAL LOADS
 ###############################################################################
 
-config = "C" # S/C
+""" config = "C" # S/C
 #model = "A" # A/M/J/W
 model_list = ["M"]
 #speed = "7" # 3=0.3m/s
 velocities = ["03", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 CMs = ["01", "0102", "02", "03", "04", "06", "08", "10"]
-CM_choice = 1
+CM_choice = 1 """
 
 
 """FxS_num = []
@@ -251,7 +253,7 @@ for model in model_list:
         Fx_mean_model_list.append(loadx_mean)
     FxS_num.append(Fx_mean_model_list)  """
  
-
+""" 
 FxC_num = []
 for model in model_list:
     Fx_mean_model_list = []
@@ -269,7 +271,7 @@ for model in model_list:
         filename = "correct_results_num/" + str(config)+"_"+str(model)+ "/" + run + ".h5"
         time, loadx, loadz, loadx_mean = get_numerical_loads(filename)
         Fx_mean_model_list.append(loadx_mean)
-    FxC_num.append(Fx_mean_model_list)   
+    FxC_num.append(Fx_mean_model_list)  """  
 
 #####################################################ß##########################
 # PLOTS
@@ -401,7 +403,7 @@ filepath = os.path.join("Plots", savename)
 plt.savefig(filepath, dpi=600)
 plt.close() """
 
-
+""" 
 plt.figure(figsize=(10, 7)) 
 plt.plot(U_list_origo, FxC_list[1], marker='D', color='orange', label="May")
 plt.plot(U_list, FxC_num[0], ls='dashed', marker=".", color='orange', label="May Numerical")
@@ -415,7 +417,7 @@ plt.ylabel("Drag force [N]")
 savename = "Fx_Mean_Cluster_May_CM_" + CMs[CM_choice] + ".png"
 filepath = os.path.join("Plots", savename)
 plt.savefig(filepath, dpi=300)
-plt.close()
+plt.close() """
 """
 
 plt.figure(figsize=(10, 7)) 
@@ -485,6 +487,7 @@ filepath = os.path.join("Plots", "Fz_Mean_Cluster.png")
 plt.savefig(filepath, dpi=300)
 #plt.show() """
 
+os.makedirs("Cd_bulk Plots", exist_ok=True) 
 #Cd_bulk plots 
 plt.figure(figsize=(9, 6)) 
 plt.plot(CaS_list[0][2:], Cd_bulkS_list[0][2:], '.--', label="April")
@@ -495,21 +498,25 @@ plt.legend()
 plt.grid()
 plt.title("Single")
 plt.xlabel(r"$Ca$", fontsize=16)
+plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
 plt.ylabel(r"$C_{D,bulk}$", fontsize=16)
-filepath = os.path.join("Plots", "CD_bulk_Single_new.png")
+filepath = os.path.join("Cd_bulk Plots", "CD_bulk_Single_2.png")
 plt.savefig(filepath, dpi=300)
-#plt.show()
-#[1:]
+
 plt.figure(figsize=(9, 6)) 
-plt.plot(CaC_list[0][2:], Cd_bulkC_list[0][2:], '.--', label="April")
+plt.plot(CaC_list[0], Cd_bulkC_list[0], '.--', label="April")
 plt.plot(CaC_list[1][2:], Cd_bulkC_list[1][2:], '.--', label="May")
 plt.plot(CaC_list[2][2:], Cd_bulkC_list[2][2:], '.--', label="June")
 plt.plot(CaC_list[3][2:], Cd_bulkC_list[3][2:], '.--', label="Wavy")
 plt.legend()
 plt.grid()
-plt.title("Cluster")
+plt.ylim(0.03, 15)
+plt.yticks(np.arange(0.03, 15, 2))
+plt.xticks(np.arange(0.01e5, 2.5e5, 0.1e5))
+plt.title(r"$C_{D,bulk}$ Cluster")
+plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
 plt.xlabel("Ca")
-plt.ylabel("Cd")
-filepath = os.path.join("Plots", "CD_bulk_Cluster_new.png")
+plt.ylabel(r"$C_{D,bulk}$")
+filepath = os.path.join("Cd_bulk Plots", "CD_bulk_Cluster_2.png")
 plt.savefig(filepath, dpi=300)
 #plt.show()  
