@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 from scipy.optimize import curve_fit
+import scipy.signal as signal
 #from plot_loads import get_numerical_loads
 
 def experiment_data(filename_bin, filename_TST):
@@ -142,6 +143,8 @@ Cd_bulkS_list = []
 Cd_bulkC_list = []
 CaS_list = []
 CaC_list = []
+timeS_list = []
+timeC_list = []
 
 
 for config in config_list:
@@ -150,6 +153,7 @@ for config in config_list:
         Fz_model = []
         Cd_model = []
         Ca_model = []
+        time_model = []
         for i in range(10):
             Fx_zero = Fx_zero_list[i]
             Fz_zero = Fz_zero_list[i]
@@ -172,10 +176,12 @@ for config in config_list:
                     Fx_runs.append(np.mean(Fx))
                     Fz_runs.append(np.mean(Fz))
                 Fx = Fx_runs
-                Fz = Fz_runs    
+                Fz = Fz_runs
+                time_model.append(t)    
             else:     
                 time, water_speed, Fx, Fy, Fz, Mx, My, Mz = experiment_data(filename_bin, filename_TST)
                 t, Fx, Fz = cut_timeseries(100, 200, time, Fx, Fz)
+                time_model.append(t)
             
             Fx_model.append(np.mean(Fx)-Fx_zero)
             Fz_model.append(np.mean(Fz)-Fz_zero)
@@ -194,12 +200,14 @@ for config in config_list:
             FzS_list.append(Fz_model)
             Cd_bulkS_list.append(Cd_model)
             CaS_list.append(Ca_model)
+            timeS_list.append(time_model)
 
         else: 
             FxC_list.append(Fx_model)
             FzC_list.append(Fz_model)
             Cd_bulkC_list.append(Cd_model)
             CaC_list.append(Ca_model)   
+            timeC_list.append(time_model)
 
 
 
@@ -215,11 +223,13 @@ exponent_list = []
 curve_fit_list = []
 
 for i in range(len(model_list)):
-    params, covariance = curve_fit(power_func, U_list, FxS_list[i])
+    params, covariance = curve_fit(power_func, U_list, FxC_list[i])
     a, b = params
     exponent_list.append(b)
     curve_fit_list.append(power_func(U_list, a, b))
+    print(float(a))
 print("Exponents:", exponent_list) """
+
 
 ###############################################################################
 # NUMERICAL LOADS
@@ -504,19 +514,21 @@ filepath = os.path.join("Cd_bulk Plots", "CD_bulk_Single_2.png")
 plt.savefig(filepath, dpi=300)
 
 plt.figure(figsize=(9, 6)) 
-plt.plot(CaC_list[0], Cd_bulkC_list[0], '.--', label="April")
+plt.plot(CaC_list[0][1:], Cd_bulkC_list[0][1:], '.--', label="April")
 plt.plot(CaC_list[1][2:], Cd_bulkC_list[1][2:], '.--', label="May")
 plt.plot(CaC_list[2][2:], Cd_bulkC_list[2][2:], '.--', label="June")
-plt.plot(CaC_list[3][2:], Cd_bulkC_list[3][2:], '.--', label="Wavy")
+plt.plot(CaC_list[3][1:], Cd_bulkC_list[3][1:], '.--', label="Wavy")
 plt.legend()
 plt.grid()
-plt.ylim(0.03, 15)
-plt.yticks(np.arange(0.03, 15, 2))
-plt.xticks(np.arange(0.01e5, 2.5e5, 0.1e5))
+#plt.ylim(0.03, 0.12)
+#plt.yticks(np.arange(0.03, 15, 2))
+#plt.xticks(np.arange(0.01e5, 2.5e5, 0.1e5))
 plt.title(r"$C_{D,bulk}$ Cluster")
 plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
 plt.xlabel("Ca")
 plt.ylabel(r"$C_{D,bulk}$")
 filepath = os.path.join("Cd_bulk Plots", "CD_bulk_Cluster_2.png")
 plt.savefig(filepath, dpi=300)
-#plt.show()  
+#plt.show()   """ """
+
+

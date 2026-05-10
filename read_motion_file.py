@@ -60,7 +60,7 @@ def readfile_motion(filename, config):
       y_arr = np.append(y_arr, clean_number(y))
   return t_arr, x_arr, y_arr
 
-t, x_arr, y = readfile_motion("master_jenny_oystein/video_data/S_J_5_1.txt", "S")
+""" t, x_arr, y = readfile_motion("master_jenny_oystein/video_data/S_J_5_1.txt", "S")
 y_values = y - np.nanmean(y)
 
 plt.figure(figsize=(9, 6)) 
@@ -71,4 +71,4 @@ plt.xlabel("Time [s]")
 plt.ylabel("Displacement [m]")
 os.makedirs("Plots", exist_ok=True) 
 filepath = os.path.join("Plots", "timeseries_example_S_J_5.png")
-plt.savefig(filepath, dpi=300)
+plt.savefig(filepath, dpi=300) """

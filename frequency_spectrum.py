@@ -130,13 +130,16 @@ for i in range(5):
 # Compare speeds (frequency cpectrums)
 ###############################################################################
 
-config = "S" # S/C
-model = "J" # A/M/J/W
+config = "C" # S/C
+model = "A" # A/M/J/W
 #speed = "3" # 3=0.3 m/s
 #cutoff_freq = 0.1 # Hz (to remove low-frequency drift)
 
-speeds = ["3", "4", "5", "6", "7", "8", "9"] 
-vel = [ 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+speeds = ["2", "3", "4", "5", "6", "7", "8", "9"] 
+vel = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+
+speeds = speeds[1:-1] 
+vel = vel[1:-1]
 
 # freq_dominant, y_max, freq_dominant_filtered, freq, X_mag, X_filtered_mag = make_freq_spectrum(file, run, config, cutoff_freq)
 
@@ -154,6 +157,7 @@ for speed in speeds:
     run = str(config)+"_"+str(model)+"_"+str(speed)+"_1"
     file = "master_jenny_oystein/video_data/" + run + ".txt"
 
+    #Need to be changed for each model
     if int(speed) < 7:
         cutoff_freq = 1
     else:
@@ -247,7 +251,7 @@ for i in range(len(speeds)):
     print(y_max_list[i]) """
 
 
-#Smoothed frequency spectrums
+""" #Smoothed frequency spectrums
 plt.figure(figsize=(8,5))
 
 for i, speed in enumerate(speeds):
@@ -255,16 +259,16 @@ for i, speed in enumerate(speeds):
     X = X_filtered_mag_list[i]
 
     X_norm = X / np.max(X)
-    X_smooth = gaussian_filter1d(X_norm, sigma=20)
+    X_smooth = gaussian_filter1d(X_norm, sigma=15)
 
     plt.plot(freq, X_smooth, label=f"{vel[i]} m/s")
 
 plt.xlim(0, 10)
 plt.xlabel("Frequency [Hz]")
 plt.ylabel("Normalised smoothed magnitude")
-plt.title("Smoothed frequency spectra Single June")
+plt.title("Smoothed frequency spectra Cluster April")
 plt.legend()
 plt.grid(True)
-filepath = os.path.join("Spectrums_comparison_filtered", "spectrum_filtered_values_"+str(config)+"_"+str(model)+"_"+str(speeds[i])+".png")
+filepath = os.path.join("Spectrums_comparison_filtered", "spectrum_smoothed_"+str(config)+"_"+str(model)+"_.png")
 plt.savefig(filepath, dpi=300)
-plt.close() 
+plt.close()  """
