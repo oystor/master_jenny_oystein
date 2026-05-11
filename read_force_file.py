@@ -122,12 +122,11 @@ for i in range(5):
 
 config_list = ["S", "C"] 
 model_list = ["A", "M", "J", "W"]
-
-#Dimensions of the models
-lengths = [0.3014, 0.437, 0.5142, 0.5208] # m
-widths = [0.046, 0.063, 0.0728, 0.073] # m
-d = [0.000849, 0.000953, 0.000903, 0.001449] # m (thickness)
-rho = [850, 754, 852, 1159] # kg/m^3 (density)    
+#model_list = ["W"]
+lengths = np.array([29.04, 42.60, 50.32, 50.32]) * 10**(-2) # m
+widths = np.array([4.6, 6.3, 7.28, 7.28]) * 10**(-2) # m
+ds = np.array([0.00084867, 0.00095333, 0.00090267, 0.00090267])
+d_wavy = 0.00144867 # m (thickness for wavy model)
 E = 1.26 * 10**6 # Pa
 t_c = 1.86 # cluster thickness parameter
 
@@ -189,11 +188,11 @@ for config in config_list:
             #Calculate Cd_bulk and Cauchy number for each run
             if config=="S":
                 Cd_model.append(Cd_bulk(lengths[m], widths[m], U_list[i], np.mean(Fx)-Fx_zero))
-                Ca_model.append(cauchy_number(lengths[m], widths[m], d[m], U_list[i], E))
+                Ca_model.append(cauchy_number(lengths[m], widths[m], ds[m], U_list[i], E))
             else: 
                 # d = d*1.86 for cluster configuration and w = 3*w
                 Cd_model.append(Cd_bulk(lengths[m], 3*widths[m], U_list[i], np.mean(Fx)-Fx_zero))
-                Ca_model.append(cauchy_number(lengths[m], 3*widths[m], d[m]*t_c, U_list[i], E))
+                Ca_model.append(cauchy_number(lengths[m], 3*widths[m], ds[m]*1.86, U_list[i], E))
             
         if config=="S":
             FxS_list.append(Fx_model)
@@ -209,8 +208,30 @@ for config in config_list:
             CaC_list.append(Ca_model)   
             timeC_list.append(time_model)
 
-
-
+Cas_S_A = CaS_list[0]
+Cas_S_M = CaS_list[1]
+Cas_S_J = CaS_list[2]
+Cas_S_W = CaS_list[3]
+Cas_C_A = CaC_list[0]
+Cas_C_M = CaC_list[1]
+Cas_C_J = CaC_list[2]
+Cas_C_W = CaC_list[3]
+Cas_S_A_origo = np.append(Cas_S_A, 0)
+Cas_S_A_origo = np.sort(Cas_S_A_origo)
+Cas_S_M_origo = np.append(Cas_S_M, 0)
+Cas_S_M_origo = np.sort(Cas_S_M_origo)
+Cas_S_J_origo = np.append(Cas_S_J, 0)
+Cas_S_J_origo = np.sort(Cas_S_J_origo)
+Cas_S_W_origo = np.append(Cas_S_W, 0)
+Cas_S_W_origo = np.sort(Cas_S_W_origo)
+Cas_C_A_origo = np.append(Cas_C_A, 0)
+Cas_C_A_origo = np.sort(Cas_C_A_origo)
+Cas_C_M_origo = np.append(Cas_C_M, 0)
+Cas_C_M_origo = np.sort(Cas_C_M_origo)
+Cas_C_J_origo = np.append(Cas_C_J, 0)
+Cas_C_J_origo = np.sort(Cas_C_J_origo)
+Cas_C_W_origo = np.append(Cas_C_W, 0)
+Cas_C_W_origo = np.sort(Cas_C_W_origo)
 
 ###############################################################################
 # FINNE VOGEL EXPONENT
@@ -237,47 +258,35 @@ print("Exponents:", exponent_list) """
 
 """ config = "C" # S/C
 #model = "A" # A/M/J/W
-model_list = ["M"]
+model_list = ["J"]
 #speed = "7" # 3=0.3m/s
 velocities = ["03", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-CMs = ["01", "0102", "02", "03", "04", "06", "08", "10"]
-CM_choice = 1 """
+print(len(CaS_list))
+CMs = ["005","01", "0102", "02", "03", "04", "06", "08", "10"]
+CM_choice = 0
+CM_list = ["02", "03", "10"]
+"""
+FxS_num = []
+for CM in CM_list:
+    for model in model_list:
+        Fx_mean_model_list = []
+        #Looping through all vlelocities for the given config and model 
+        for i in range(len(velocities)):
 
+            run = str(config)+"_"+str(model)+"_"+str(velocities[i])+"_"+CM
+            filename = "correct_results_num/" + str(config)+"_"+str(model)+ "/" + run + ".h5"
+            time, loadx, loadz, loadx_mean = get_numerical_loads(filename)
+            Fx_mean_model_list.append(loadx_mean)
+        FxS_num.append(Fx_mean_model_list)  
+"""
 
-"""FxS_num = []
-for model in model_list:
-    Fx_mean_model_list = []
-    #Looping through all vlelocities for the given config and model 
-    for i in range(len(velocities)):
-        if config == "S" and model == "J" and CMs[CM_choice] == "03":
-            run = str(config)+"_"+str(model)+"_"+str(velocities[i])+"_"+CMs[CM_choice]
-        elif config == "S" and model == "W" and CMs[CM_choice] == "03":
-            run = str(config)+"_"+str(model)+"_"+str(velocities[i])+"_"+CMs[CM_choice]
-        else:            
-            if float(velocities[i]) < 4:
-                run = str(config)+"_"+str(model)+"_"+str(velocities[i])+"_"+"10"
-            else:
-                run = str(config)+"_"+str(model)+"_"+str(velocities[i])+"_"+CMs[CM_choice]
-        filename = "correct_results_num/" + str(config)+"_"+str(model)+ "/" + run + ".h5"
-        time, loadx, loadz, loadx_mean = get_numerical_loads(filename)
-        Fx_mean_model_list.append(loadx_mean)
-    FxS_num.append(Fx_mean_model_list)  """
- 
-""" 
 FxC_num = []
 for model in model_list:
     Fx_mean_model_list = []
     #Looping through all vlelocities for the given config and model 
     for i in range(len(velocities)):
-        if config == "C" and model == "A" and CMs[CM_choice] == "01":
-            run = str(config)+"_"+str(model)+"_"+str(velocities[i])+"_"+CMs[CM_choice]
-        elif config == "C" and model == "M" and CMs[CM_choice] == "0102":
-            run = str(config)+"_"+str(model)+"_"+str(velocities[i])+"_"+CMs[CM_choice]
-        else:
-            if float(velocities[i]) < 4:
-                run = str(config)+"_"+str(model)+"_"+str(velocities[i])+"_"+"10"
-            else:
-                run = str(config)+"_"+str(model)+"_"+str(velocities[i])+"_"+CMs[CM_choice]
+
+        run = str(config)+"_"+str(model)+"_"+str(velocities[i])+"_"+CMs[CM_choice]
         filename = "correct_results_num/" + str(config)+"_"+str(model)+ "/" + run + ".h5"
         time, loadx, loadz, loadx_mean = get_numerical_loads(filename)
         Fx_mean_model_list.append(loadx_mean)
@@ -295,6 +304,8 @@ for i in range(len(FxS_list)):
 
 U_list_origo = np.append(U_list, 0)
 U_list_origo = np.sort(U_list_origo) 
+
+
 os.makedirs("Plots", exist_ok=True) 
 
 """ #Fx mean plots for single configuration
@@ -380,8 +391,26 @@ plt.ylabel("Drag force [N]")
 savename = "Fx_Mean_Single_June_CM_" + CMs[CM_choice] + ".png"
 filepath = os.path.join("Plots", savename)
 plt.savefig(filepath, dpi=300)
-plt.close()
+plt.close()"""
+
+#subplots for single configuration
 """
+plt.figure(figsize=(10, 7)) 
+plt.plot(Cas_S_J_origo, FxS_list[2], 'D', color='orange', label="June Experimental")
+plt.plot(Cas_S_J, FxS_num[0], ls="dashed", marker=".", color='red', label="June Numerical with CM: " + CM_list[0])
+plt.plot(Cas_S_J, FxS_num[1], ls="dashed", marker=".", color='green', label="June Numerical with CM: " + CM_list[1])
+plt.plot(Cas_S_J, FxS_num[2], ls="dashed", marker=".", color='blue', label="June Numerical with CM: " + CM_list[2])
+plt.plot(0, 0, 'black', marker='o', label="Origo")
+plt.legend()
+plt.grid()
+plt.title("Single blade - June, with C_M: " + CMs[CM_choice])
+plt.xlabel("Cauchy number [-]")
+plt.ylabel("Drag force [N]")
+savename = "Fx_Mean_Single_June_CMs_" + CM_list[0] + "_" + CM_list[1] + "_" + CM_list[2] + ".png"
+filepath = os.path.join("Plots", savename)
+plt.savefig(filepath, dpi=300)
+plt.close()"""
+
 """ plt.figure(figsize=(10, 7)) 
 plt.plot(U_list_origo, FxS_list[3], 'D', color='red', label="Wavy Experimental")
 plt.plot(U_list, FxS_num[0], ls="dashed", marker=".", color='red', label="Wavy Numerical")
@@ -399,8 +428,8 @@ plt.close()  """
 
 """ #subplots for cluster configuration
 plt.figure(figsize=(10, 7)) 
-plt.plot(U_list_origo, FxC_list[0], 'D', color='blue', label="April")
-plt.plot(U_list, FxC_num[0], ls='dashed', marker=".", color='blue', label="April Numerical")
+plt.plot(Cas_C_A_origo, FxC_list[0], 'D', color='blue', label="April")
+plt.plot(Cas_C_A, FxC_num[0], ls='dashed', marker=".", color='blue', label="April Numerical")
 #plt.plot(U_list, curve_fit_list[0], '--', color='blue', label="Curve fit April")
 plt.plot(0, 0, 'black', marker='o', label="Origo")
 plt.legend()
@@ -413,10 +442,10 @@ filepath = os.path.join("Plots", savename)
 plt.savefig(filepath, dpi=600)
 plt.close() """
 
-""" 
+"""
 plt.figure(figsize=(10, 7)) 
-plt.plot(U_list_origo, FxC_list[1], marker='D', color='orange', label="May")
-plt.plot(U_list, FxC_num[0], ls='dashed', marker=".", color='orange', label="May Numerical")
+plt.plot(Cas_C_M_origo, FxC_list[1], marker='D', color='orange', label="May")
+plt.plot(Cas_C_M, FxC_num[0], ls='dashed', marker=".", color='orange', label="May Numerical")
 #plt.plot(U_list, curve_fit_list[1], '--', color='orange', label="Curve fit May")
 plt.plot(0, 0, 'black', marker='o', label="Origo")
 plt.legend()
@@ -427,22 +456,23 @@ plt.ylabel("Drag force [N]")
 savename = "Fx_Mean_Cluster_May_CM_" + CMs[CM_choice] + ".png"
 filepath = os.path.join("Plots", savename)
 plt.savefig(filepath, dpi=300)
-plt.close() """
-"""
+plt.close()"""
+
 
 plt.figure(figsize=(10, 7)) 
-plt.plot(U_list_origo, FxC_list[2], '.', color='green', label="June")
-plt.plot(U_list, FxC_num[2], '-', color='green', label="June Numerical")
+plt.plot(Cas_C_J_origo, FxC_list[2], 'D', color='green', label="Model: June, Experimental")
+plt.plot(Cas_C_J, FxC_num[0], ls='dashed', marker=".", color='green', label="Model: June, Numerical")
 #plt.plot(U_list, curve_fit_list[2], '--', color='green', label="Curve fit June")
 plt.plot(0, 0, 'black', marker='o', label="Origo")
 plt.legend()
 plt.grid()
-plt.title("June Cluster")
-plt.xlabel("Flow velocity [m/s]")
+plt.title("Cluster - June, with C_M: " + CMs[CM_choice])
+plt.xlabel("Cauchy number [-]")
 plt.ylabel("Drag force [N]")
-filepath = os.path.join("Plots", "Fx_Mean_June_Cluster.png")
+savename = "Fx_Mean_Cluster_June_CM_" + CMs[CM_choice] + ".png"
+filepath = os.path.join("Plots", savename)
 plt.savefig(filepath, dpi=300)
-plt.close() """
+plt.close() 
 
 
 #Fz plots for single configuration
