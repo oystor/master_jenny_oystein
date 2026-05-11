@@ -107,20 +107,19 @@ for speed in speeds:
     freq_dominant_filtered_list.append(freq_dominant_filtered)
 
 
-""" #Print frequencies
+ #Print frequencies
 print("Dominant frequencies unfiltered:")
 for i in range(len(speeds)):
     print(freq_dominant_list[i]) 
 
 print("Dominant frequency filtered:")
 for i in range(len(speeds)):
-    print(freq_dominant_filtered_list[i])  """
-
+    print(freq_dominant_filtered_list[i])  
 
 os.makedirs("Fz_frequency", exist_ok=True) 
 #Filtered spectrum 
 
-""" for i in range(len(speeds)): 
+for i in range(len(speeds)): 
     plt.figure(figsize=(10, 6)) 
     plt.plot(freq_list[i], Fz_fft_filtered_mag_list[i], label = "0."+speeds[i]+" m/s")
     plt.legend()    
@@ -152,6 +151,6 @@ plt.legend()
 plt.grid(True)
 filepath = os.path.join("Fz_frequency", "spectrum_smoothed_"+str(config)+"_"+str(model)+"_.png")
 plt.savefig(filepath, dpi=300)
-plt.close()  """
+plt.close() 
 
 

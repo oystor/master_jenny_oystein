@@ -266,7 +266,7 @@ CMs = ["005","01", "0102", "02", "03", "04", "06", "08", "10"]
 CM_choice = 0
 CM_list = ["02", "03", "10"]
 """
-FxS_num = []
+""" FxS_num = []
 for CM in CM_list:
     for model in model_list:
         Fx_mean_model_list = []
@@ -277,7 +277,7 @@ for CM in CM_list:
             filename = "correct_results_num/" + str(config)+"_"+str(model)+ "/" + run + ".h5"
             time, loadx, loadz, loadx_mean = get_numerical_loads(filename)
             Fx_mean_model_list.append(loadx_mean)
-        FxS_num.append(Fx_mean_model_list)  
+        FxS_num.append(Fx_mean_model_list)   """
 """
 
 FxC_num = []
@@ -459,7 +459,7 @@ plt.savefig(filepath, dpi=300)
 plt.close()"""
 
 
-plt.figure(figsize=(10, 7)) 
+""" plt.figure(figsize=(10, 7)) 
 plt.plot(Cas_C_J_origo, FxC_list[2], 'D', color='green', label="Model: June, Experimental")
 plt.plot(Cas_C_J, FxC_num[0], ls='dashed', marker=".", color='green', label="Model: June, Numerical")
 #plt.plot(U_list, curve_fit_list[2], '--', color='green', label="Curve fit June")
@@ -472,7 +472,7 @@ plt.ylabel("Drag force [N]")
 savename = "Fx_Mean_Cluster_June_CM_" + CMs[CM_choice] + ".png"
 filepath = os.path.join("Plots", savename)
 plt.savefig(filepath, dpi=300)
-plt.close() 
+plt.close()  """
 
 
 #Fz plots for single configuration
@@ -527,7 +527,7 @@ filepath = os.path.join("Plots", "Fz_Mean_Cluster.png")
 plt.savefig(filepath, dpi=300)
 #plt.show() """
 
-os.makedirs("Cd_bulk Plots", exist_ok=True) 
+""" os.makedirs("Cd_bulk Plots", exist_ok=True) 
 #Cd_bulk plots 
 plt.figure(figsize=(9, 6)) 
 plt.plot(CaS_list[0][2:], Cd_bulkS_list[0][2:], '.--', label="April")
@@ -559,6 +559,6 @@ plt.xlabel("Ca")
 plt.ylabel(r"$C_{D,bulk}$")
 filepath = os.path.join("Cd_bulk Plots", "CD_bulk_Cluster_2.png")
 plt.savefig(filepath, dpi=300)
-#plt.show()   """ """
+#plt.show()   """ """ """
 
 
