@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import os
 from scipy.optimize import curve_fit
 from plot_loads import get_numerical_loads
+from least_squares import best_fit
 
 def experiment_data(filename_bin, filename_TST):
     #Read file
@@ -191,7 +192,7 @@ for config in config_list:
             else: 
                 # d = d*1.86 for cluster configuration and w = 3*w
                 Cd_model.append(Cd_bulk(lengths[m], 3*widths[m], U_list[i], np.mean(Fx)-Fx_zero))
-                Ca_model.append(cauchy_number(lengths[m], 3*widths[m], ds[m]*1.86, U_list[i], E))
+                Ca_model.append(cauchy_number(lengths[m], 3*widths[m], ds[m]*1.86, U_list[i], E/2))
             
         if config=="S":
             FxS_list.append(Fx_model)
@@ -244,7 +245,7 @@ exponent_C_list = []
 curve_fit_S_list = []
 curve_fit_C_list = []
 for i in range(len(model_list)):
-    params, covariance = curve_fit(power_func, U_list, FxC_list[i])
+    params, covariance = curve_fit(power_func, U_list, FxS_list[i])
     a, b = params
     exponent_S_list.append(b)
     curve_fit_S_list.append(power_func(U_list, a, b))
@@ -258,14 +259,14 @@ for i in range(len(model_list)):
 # NUMERICAL LOADS
 ###############################################################################
 
-config = "S" # S/C
+""" config = "S" # S/C
 #model = "A" # A/M/J/W
-model_list = ["M"]
+model_list = ["J"]
 #speed = "7" # 3=0.3m/s
 velocities = ["03", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 CMs = ["0035", "0456", "0489","005","01", "0102","014","015", "02", "0253","0293", "03", "04", "06", "08", "10"]
 CM_choice = 9
-CM_list = ["0293", "0244"]
+CM_list = ["02", "025", "03"]
 
 FxS_num = []
 for CM in CM_list:
@@ -279,8 +280,8 @@ for CM in CM_list:
             time, loadx, loadz, loadx_mean = get_numerical_loads(filename)
             Fx_mean_model_list.append(loadx_mean)
         FxS_num.append(Fx_mean_model_list)   """
-"""
 
+"""
 FxC_num = []
 for CM in CM_list:
     for model in model_list:
@@ -335,25 +336,28 @@ plt.savefig(filepath, dpi=300)
 #subplots for single configuration
 plt.figure(figsize=(10, 7)) 
 plt.plot(Cas_S_A_origo, FxS_list[0], 'D', color='blue', label="Model: April, Experimental")
-plt.plot(Cas_S_A, FxS_num[0], ls="dashed", marker=".", color='orange', label="Model: April, Numerical with CM: 0.228")
-plt.plot(Cas_S_A, FxS_num[1], ls="dashed", marker=".", color='green', label="Model: April, Numerical with CM: 0.274")
+plt.plot(Cas_S_A, FxS_num[0], ls="dashed", marker=".", color='orange', label="Model: April, Numerical with CM: 0.128")
+plt.plot(Cas_S_A, FxS_num[1], ls="dashed", marker=".", color='green', label="Model: April, Numerical with CM: 0.228")
+plt.plot(Cas_S_A, FxS_num[2], ls="dashed", marker=".", color='red', label="Model: April, Numerical with CM: 0.274")
+print("Best fit index of CM_list:", best_fit(FxS_list[0], FxS_num[0], FxS_num[1], FxS_num[2]))
 plt.plot(Cas_S_A, curve_fit_S_list[0], '--', color='blue', label="Curve fit experimental data April")
 plt.plot(0, 0, 'black', marker='o', label="Origo")
 plt.legend()
 plt.grid()
-plt.title("Single blade - April, with C_M: " + CM_list[0])
-plt.xlabel("Flow velocity [m/s]")
+plt.xlabel("Cauchy number [-]")
 plt.ylabel("Drag force [N]")
-savename = "Fx_Mean_Single_April_CM_" + CM_list[0] + "_" + CM_list[1] + ".png"
+savename = "Fx_Mean_Single_April_CM_" + CM_list[0] + "_" + CM_list[1] + "_" + CM_list[2] + ".png"
 filepath = os.path.join("Plots", savename)
 plt.savefig(filepath, dpi=300)
 plt.close()
 """
-
+"""
 plt.figure(figsize=(10, 7)) 
 plt.plot(Cas_S_M_origo, FxS_list[1], 'D', color='orange', label="Model: May, Experimental")
-plt.plot(Cas_S_M, FxS_num[0], ls="dashed", marker=".", color='blue', label="Model: May, Numerical with CM: 0.293")
+plt.plot(Cas_S_M, FxS_num[0], ls="dashed", marker=".", color='blue', label="Model: May, Numerical with CM: 0.144")
 plt.plot(Cas_S_M, FxS_num[1], ls="dashed", marker=".", color='green', label="Model: May, Numerical with CM: 0.244")
+plt.plot(Cas_S_M, FxS_num[2], ls="dashed", marker=".", color='red', label="Model: May, Numerical with CM: 0.293")
+print("Best fit index of CM_list:", best_fit(FxS_list[1], FxS_num[0], FxS_num[1], FxS_num[2]))
 plt.plot(Cas_S_M, curve_fit_S_list[1], '--', color='orange', label="Curve fit experimental data May")
 plt.plot(0, 0, 'black', marker='o', label="Origo")
 plt.legend()
@@ -361,16 +365,19 @@ plt.grid()
 plt.title("Single blade - May with C_M: " + CM_list[0])
 plt.xlabel("Cauchy number [-]")
 plt.ylabel("Drag force [N]")
-savename = "Fx_Mean_Single_May_CM_" + CM_list[0] + "_" + CM_list[1] + ".png"
+savename = "Fx_Mean_Single_May_CM_" + CM_list[0] + "_" + CM_list[1] + "_" + CM_list[2] + ".png"
 filepath = os.path.join("Plots", savename)
 plt.savefig(filepath, dpi=300)
 plt.close()
-
+"""
 """
 plt.figure(figsize=(10, 7)) 
 plt.plot(Cas_S_J_origo, FxS_list[2], 'D', color='blue', label="Model: June Experimental")
-plt.plot(Cas_S_J, FxS_num[0], ls='dashed', marker=".", color='orange', label="Model: June Numerical")
+plt.plot(Cas_S_J, FxS_num[0], ls='dashed', marker=".", color='orange', label="Model: June Numerical with CM: 0.2")
+plt.plot(Cas_S_J, FxS_num[1], ls='dashed', marker=".", color='green', label="Model: June Numerical with CM: 0.25")
+plt.plot(Cas_S_J, FxS_num[2], ls='dashed', marker=".", color='red', label="Model: June Numerical with CM: 0.3")
 plt.plot(Cas_S_J, curve_fit_S_list[2], '--', color='blue', label="Curve fit experimental data June")
+print("Best fit index of CM_list:", best_fit(FxS_list[2], FxS_num[0], FxS_num[1], FxS_num[2]))
 plt.plot(0, 0, 'black', marker='o', label="Origo")
 plt.legend()
 plt.grid()
@@ -400,7 +407,23 @@ plt.savefig(filepath, dpi=300)
 plt.close()"""
 """
 #subplots for single configuration
-""""""
+plt.figure(figsize=(10, 7)) 
+plt.plot(Cas_S_W_origo, FxS_list[3], 'D', color='blue', label="Model: Wavy, Experimental")
+plt.plot(Cas_S_W, FxS_num[0], ls="dashed", marker=".", color='orange', label="Model: Wavy, Numerical")
+plt.plot(Cas_S_W, curve_fit_S_list[3], '--', color='blue', label="Curve fit Wavy")
+plt.plot(0, 0, 'black', marker='o', label="Origo")
+plt.legend()
+plt.grid()
+plt.title("Single blade - Wavy, with C_M: " + CMs[CM_choice])
+plt.xlabel("Cauchy number [-]")
+plt.ylabel("Drag force [N]")
+savename = "Fx_Mean_Single_Wavy_CM_" + CMs[CM_choice] + ".png"
+filepath = os.path.join("Plots", savename)
+plt.savefig(filepath, dpi=300)
+plt.close()
+#subplots for single configuration
+"""
+"""
 #Plot for finding the best CM for Single_june
 plt.figure(figsize=(10, 7)) 
 plt.plot(Cas_S_J_origo, FxS_list[2], 'D', color='orange', label="June Experimental")
@@ -485,32 +508,30 @@ plt.close()
 """"""
 plt.figure(figsize=(10, 7)) 
 plt.plot(Cas_C_J_origo, FxC_list[2], 'D', color='orange', label="June Experimental")
-plt.plot(Cas_C_J, FxC_num[0], ls="dashed", marker=".", color='red', label="June Numerical with CM: " + CM_list[0])
-plt.plot(Cas_C_J, FxC_num[1], ls="dashed", marker=".", color='green', label="June Numerical with CM: " + CM_list[1])
-plt.plot(Cas_C_J, FxC_num[2], ls="dashed", marker=".", color='blue', label="June Numerical with CM: " + CM_list[2])
+plt.plot(Cas_C_J, FxC_num[0], ls="dashed", marker=".", color='red', label="June Numerical with CM: 0.15")
+plt.plot(Cas_C_J, FxC_num[1], ls="dashed", marker=".", color='green', label="June Numerical with CM: 0.3")
 plt.plot(Cas_C_J, curve_fit_C_list[2], ls='dashed', color='orange', label="Curve fit experimental data June")
 plt.plot(0, 0, 'black', marker='o', label="Origo")
 plt.legend()
 plt.grid()
-plt.title("Cluster - June, with varying C_Ms")
 plt.xlabel("Cauchy number [-]")
 plt.ylabel("Drag force [N]")
-savename = "Fx_Mean_Cluster_June_CMs_" + CM_list[0] + "_" + CM_list[1] + "_" + CM_list[2] + ".png"
+savename = "Fx_Mean_Cluster_June_CMs_" + CM_list[0] + "_" + CM_list[1] + ".png"
 filepath = os.path.join("Plots", savename)
 plt.savefig(filepath, dpi=300)
 plt.close()"""
 """
 plt.figure(figsize=(10, 7)) 
-plt.plot(Cas_C_W_origo, FxC_list[3], 'D', color='orange', label="Wavy Experimental")
-plt.plot(Cas_C_W, FxC_num[0], ls="dashed", marker=".", color='red', label="Wavy Numerical with CM: " + CM_list[0])
+plt.plot(Cas_C_W_origo, FxC_list[3], 'D', color='orange', label="Model: Cluster, Wavy Experimental")
+plt.plot(Cas_C_W, FxC_num[0], ls="dashed", marker=".", color='red', label="Model: Cluster, Wavy Numerical with CM: 0.1")
+plt.plot(Cas_C_W, FxC_num[1], ls="dashed", marker=".", color='green', label="Model: Cluster, Wavy Numerical with CM: 0.14")
 plt.plot(Cas_C_W, curve_fit_C_list[3], ls='dashed', color='orange', label="Curve fit experimental data Wavy")
 plt.plot(0, 0, 'black', marker='o', label="Origo")
 plt.legend()
 plt.grid()
-plt.title("Cluster - Wavy, with C_M: " + CM_list[0])
 plt.xlabel("Cauchy number [-]")
 plt.ylabel("Drag force [N]")
-savename = "Fx_Mean_Cluster_Wavy_CMs_" + CM_list[0] + ".png"
+savename = "Fx_Mean_Cluster_Wavy_CMs_" + CM_list[0] + "_" + CM_list[1] + ".png"
 filepath = os.path.join("Plots", savename)
 plt.savefig(filepath, dpi=300)
 plt.close()"""
@@ -566,6 +587,8 @@ plt.ylabel("Mean Force [N]")
 filepath = os.path.join("Plots", "Fz_Mean_Cluster.png")
 plt.savefig(filepath, dpi=300)
 #plt.show() """
+
+
 """
 os.makedirs("Cd_bulk Plots", exist_ok=True) 
 #Cd_bulk plots 
@@ -581,13 +604,14 @@ plt.xlabel(r"$Ca$", fontsize=16)
 plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
 plt.ylabel(r"$C_{D,bulk}$", fontsize=16)
 filepath = os.path.join("Cd_bulk Plots", "CD_bulk_Single_2.png")
-plt.savefig(filepath, dpi=300)
+plt.savefig(filepath, dpi=300)"""
 
+os.makedirs("Cd_bulk Plots", exist_ok=True) 
 plt.figure(figsize=(9, 6)) 
-plt.plot(CaC_list[0][1:], Cd_bulkC_list[0][1:], '.--', label="April")
+plt.plot(CaC_list[0][2:], Cd_bulkC_list[0][2:], '.--', label="April")
 plt.plot(CaC_list[1][2:], Cd_bulkC_list[1][2:], '.--', label="May")
 plt.plot(CaC_list[2][2:], Cd_bulkC_list[2][2:], '.--', label="June")
-plt.plot(CaC_list[3][1:], Cd_bulkC_list[3][1:], '.--', label="Wavy")
+plt.plot(CaC_list[3][2:], Cd_bulkC_list[3][2:], '.--', label="Wavy")
 plt.legend()
 plt.grid()
 #plt.ylim(0.03, 0.12)
@@ -598,5 +622,5 @@ plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
 plt.xlabel("Ca")
 plt.ylabel(r"$C_{D,bulk}$")
 filepath = os.path.join("Cd_bulk Plots", "CD_bulk_Cluster_2.png")
-plt.savefig(filepath, dpi=300)"""
+plt.savefig(filepath, dpi=300)
 #plt.show()  
