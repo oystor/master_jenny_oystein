@@ -3,6 +3,7 @@ import h5py
 import os
 import matplotlib.pyplot as plt
 import scipy.signal as signal
+from scipy.ndimage import gaussian_filter1d
 
 
 def read(hdf5file, group, dataset):
@@ -11,19 +12,12 @@ def read(hdf5file, group, dataset):
 
 
 def get_tip_displacement(h5_file):
-    """
-    Reads an HDF5 simulation file and returns:
-    
-    - time_list: list of time values
-    - tip_y_list: list of vertical displacement values
-                  for the last node (tip of the blade)
-    """
 
-    # Read time array
+    #Read time
     t = read(h5_file, "TrussSystem", "time")
     time_list = t.flatten()
 
-    # Number of nodes
+    #Number of nodes
     Nn = int(read(h5_file, "TrussSystem", "number_node")[0])
 
     # Number of timesteps
@@ -45,10 +39,18 @@ def get_tip_displacement(h5_file):
 
         tip_y_list.append(y_tip)
 
+         # Keep only the last half
+    half_index = steps // 2
+
+    time_list = time_list[half_index:]
+    tip_y_list = tip_y_list[half_index:]
+
     return list(time_list), tip_y_list
 
 
-def freq_spectrum(time, y, cutoff_freq):
+def freq_spectrum(h5_file, cutoff_freq):
+
+    time, y = get_tip_displacement(h5_file)
     
     #subtract mean to focus on oscillations
     y_values = y - np.nanmean(y)
@@ -77,16 +79,16 @@ def freq_spectrum(time, y, cutoff_freq):
 
     return freq_dominant, y_max, freq_dominant_filtered, freq, X_mag, X_filtered_mag
 
-config = "S" # S/C
-model = "J" # A/M/J/W
+config = "C" # S/C
+model = "W" # A/M/J/W
+cm = "014"
 
 speeds = ["2", "3", "4", "5", "6", "7", "8", "9"] 
-vel = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+vel = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9] 
 
-speeds = speeds[1:-1] 
-vel = vel[1:-1]
+speeds = speeds[2:] 
+vel = vel[2:] 
 
-# freq_dominant, y_max, freq_dominant_filtered, freq, X_mag, X_filtered_mag = make_freq_spectrum(file, run, config, cutoff_freq)
 
 freq_list = []
 X_mag_list = []
@@ -95,20 +97,17 @@ freq_dominant_list = []
 freq_dominant_filtered_list = []
 y_max_list = []
 
-#speeds = speeds[2:]
-#vel = vel[2:]
-
 for speed in speeds:
-    run = str(config)+"_"+str(model)+"_"+str(speed)+"_1"
-    file = "master_jenny_oystein/correct_results_num/" + run + ".txt"
+    run = str(config)+"_"+str(model)+"_"+str(speed)+"_"+str(cm)
+    file = "master_jenny_oystein/correct_results_num/"+str(config)+"_"+str(model)+"/" + run + ".h5"
 
     #Need to be changed for each model
     if int(speed) < 7:
-        cutoff_freq = 1
+        cutoff_freq = 0.3
     else:
         cutoff_freq = 1
     #print(cutoff_freq)
-    freq_dominant, y_max, freq_dominant_filtered, freq, X_mag, X_filtered_mag = freq_spectrum(file, run, config, cutoff_freq)
+    freq_dominant, y_max, freq_dominant_filtered, freq, X_mag, X_filtered_mag = freq_spectrum(file, cutoff_freq)
     
     freq_list.append(freq)
     X_mag_list.append(X_mag)
@@ -124,11 +123,10 @@ print("Dominant frequency filtered:")
 for i in range(len(speeds)):
     print(freq_dominant_filtered_list[i]) 
 
-os.makedirs("Spectrums_comparison_filtered", exist_ok=True) 
 
 
 #Filtered spectrum 
-""" os.makedirs("Spectrums_comparison_filtered", exist_ok=True) 
+os.makedirs("Numerical_Spectrums", exist_ok=True) 
 for i in range(len(speeds)): 
     plt.figure(figsize=(10, 6)) 
     plt.plot(freq_list[i], X_filtered_mag_list[i], label = "0."+speeds[i]+" m/s")
@@ -137,8 +135,31 @@ for i in range(len(speeds)):
     plt.xlabel('Frequency (Hz)', fontsize=14) 
     plt.ylabel('Magnitude', fontsize=14) 
     plt.grid()
-    plt.title("Frequency spectrum Cluster April "+ "0."+speeds[i]+" m/s", fontsize=16)
+    plt.title("Frequency spectrum numerical Cluster Wavy "+ "0."+speeds[i]+" m/s", fontsize=16)
 
-    filepath = os.path.join("Spectrums_comparison_filtered", "spectrum_filtered_values_"+str(config)+"_"+str(model)+"_"+str(speeds[i])+".png")
+    filepath = os.path.join("Numerical_Spectrums", "num_spectrum_filtered_"+str(config)+"_"+str(model)+"_"+str(speeds[i])+".png")
     plt.savefig(filepath, dpi=300)
-    plt.close() """
+    plt.close()
+
+
+#Smoothed frequency spectrums
+plt.figure(figsize=(8,5))
+
+for i, speed in enumerate(speeds):
+    freq = freq_list[i]
+    X = X_filtered_mag_list[i]
+
+    X_norm = X / np.max(X)
+    X_smooth = gaussian_filter1d(X_norm, sigma=15)
+
+    plt.plot(freq, X_smooth, label=f"{vel[i]} m/s")
+
+plt.xlim(0, 10)
+plt.xlabel("Frequency [Hz]")
+plt.ylabel("Normalised smoothed magnitude")
+#plt.title("Smoothed frequency spectra Cluster April")
+plt.legend()
+plt.grid(True)
+filepath = os.path.join("Numerical_Spectrums", "num_spectrum_smoothed_"+str(config)+"_"+str(model)+"_.png")
+plt.savefig(filepath, dpi=300)
+plt.close() 

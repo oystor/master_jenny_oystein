@@ -51,7 +51,7 @@ for i in range(len(model_list)):
         print(Ca_list[k])
     print ("Reduced velocities: ")
     for k in range(len(U)):
-        print(reduced_u_list[k])
+        print(reduced_u_list[k])"""
 
 print("CLUSTER CONFIGURATION")
 for i in range(len(model_list)):
@@ -63,7 +63,7 @@ for i in range(len(model_list)):
     ma = m_a(width)
     for j in range(len(U)):
         velocity = U[j]
-        Ca = cauchy_number(length, width, thickness, velocity, E)
+        Ca = cauchy_number(length, width, thickness, velocity, E/2)
         u_red = reduced_u(velocity, length, width, thickness, ma, E)
         Ca_list.append(Ca)
         reduced_u_list.append(u_red)
@@ -73,7 +73,7 @@ for i in range(len(model_list)):
         print(Ca_list[k])
     print ("Reduced velocities: ")
     for k in range(len(U)):
-        print(reduced_u_list[k]) """
+        print(reduced_u_list[k]) 
 
 print("Length to width ratio")   
 for i in range(len(model_list)):

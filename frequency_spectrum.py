@@ -39,55 +39,15 @@ def make_freq_spectrum(file, run, config, cutoff_freq):
     freq_dominant_filtered = np.round(freq[np.argmax(X_filtered_mag[1:]) + 1], 2)
     y_max = np.round(np.max(np.abs(y_values)), 2)
 
-    """ #PLOTS time series filtered
-    plt.figure(figsize=(9, 6))
-    plt.plot(time, filtered_values, 'k-')
-    plt.title('Time series of filtered values '+run, fontsize=18)
+     # Second dominant frequency
+    sorted_indices = np.argsort(X_mag[1:]) + 1
+    sorted_indices_filtered = np.argsort(X_filtered_mag[1:]) + 1
 
-    os.makedirs("Filtered_timeseries", exist_ok=True) 
-    filepath = os.path.join("Filtered_timeseries", "filtered_timeseries_"+run+".png")
-    plt.savefig(filepath, dpi=300)
-    plt.close() """
-    
-    """ #Unfiltered time series
-    plt.figure(figsize=(9, 6))
-    plt.plot(time, y_values, 'k-')
-    plt.title('Time series of un-filtered values '+run, fontsize=18)
+    freq_second_dominant = np.round(freq[sorted_indices[-2]], 2)
+    freq_second_dominant_filtered = np.round(freq[sorted_indices_filtered[-2]], 2)
 
-    os.makedirs("Unfiltered_timeseries", exist_ok=True) 
-    filepath = os.path.join("Unfiltered_timeseries", "timeseries_"+run+".png")
-    plt.savefig(filepath, dpi=300)
-    plt.close() """
+    return (freq_dominant, freq_second_dominant, y_max, freq_dominant_filtered, freq_second_dominant_filtered, freq, X_mag, X_filtered_mag)
 
-    """ #Frequency spectrum plots
-    plt.figure(figsize=(9, 6)) 
-    plt.plot(freq, X_mag, 'k-')
-    plt.xlim(0, 10)
-    plt.xlabel('Frequency (Hz)', fontsize=18)
-    plt.ylabel('Magnitude', fontsize=18)
-    plt.title('Frequency spectrum '+run, fontsize=18)
-    plt.grid()
-
-    os.makedirs("Unfiltered_spectrums", exist_ok=True)
-    filepath = os.path.join("Unfiltered_spectrums", "spectrum_y_values_"+run+".png")
-    plt.savefig(filepath, dpi=300)
-    plt.close()
-
-    #Filtered frequency spectrum
-    plt.figure(figsize=(9, 6)) 
-    plt.plot(freq, X_filtered_mag, 'k-')
-    plt.xlim(0, 10)
-    plt.xlabel('Frequency (Hz)', fontsize=18)
-    plt.ylabel('Magnitude', fontsize=18)
-    plt.title('Frequency spectrum '+run, fontsize=18)
-    plt.grid()
-
-    os.makedirs("Filtered_spectrums", exist_ok=True) 
-    filepath = os.path.join("Filtered_spectrums", "spectrum_filtered_values_"+run+".png")
-    plt.savefig(filepath, dpi=300)
-    plt.close() """
-
-    return freq_dominant, y_max, freq_dominant_filtered, freq, X_mag, X_filtered_mag
 
 
 ###############################################################################
@@ -130,16 +90,16 @@ for i in range(5):
 # Compare speeds (frequency cpectrums)
 ###############################################################################
 
-config = "C" # S/C
-model = "A" # A/M/J/W
+config = "S" # S/C
+model = "M" # A/M/J/W
 #speed = "3" # 3=0.3 m/s
 #cutoff_freq = 0.1 # Hz (to remove low-frequency drift)
 
 speeds = ["2", "3", "4", "5", "6", "7", "8", "9"] 
 vel = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 
-speeds = speeds[1:-1] 
-vel = vel[1:-1]
+speeds = speeds[1:] 
+vel = vel[1:]
 
 # freq_dominant, y_max, freq_dominant_filtered, freq, X_mag, X_filtered_mag = make_freq_spectrum(file, run, config, cutoff_freq)
 
@@ -149,6 +109,7 @@ X_filtered_mag_list = []
 freq_dominant_list = []
 freq_dominant_filtered_list = []
 y_max_list = []
+freq_second_dominant_filtered_list = []
 
 #speeds = speeds[2:]
 #vel = vel[2:]
@@ -158,23 +119,24 @@ for speed in speeds:
     file = "master_jenny_oystein/video_data/" + run + ".txt"
 
     #Need to be changed for each model
-    if int(speed) < 7:
-        cutoff_freq = 1
+    if int(speed) < 6:
+        cutoff_freq = 0.5
     else:
         cutoff_freq = 1
     #print(cutoff_freq)
-    freq_dominant, y_max, freq_dominant_filtered, freq, X_mag, X_filtered_mag = make_freq_spectrum(file, run, config, cutoff_freq)
+    freq_dominant, freq_second_dominant, y_max, freq_dominant_filtered, freq_second_dominant_filtered, freq, X_mag, X_filtered_mag = make_freq_spectrum(file, run, config, cutoff_freq)
     
-    freq_list.append(freq)
-    X_mag_list.append(X_mag)
-    X_filtered_mag_list.append(X_filtered_mag)
-    freq_dominant_list.append(freq_dominant)
-    freq_dominant_filtered_list.append(freq_dominant_filtered)
+    freq_list.append(freq) 
+    X_mag_list.append(X_mag) 
+    X_filtered_mag_list.append(X_filtered_mag) 
+    freq_dominant_list.append(freq_dominant) 
+    freq_dominant_filtered_list.append(freq_dominant_filtered) 
     y_max_list.append(y_max) 
+    freq_second_dominant_filtered_list.append(freq_second_dominant_filtered) 
 
 os.makedirs("Spectrums_comparison_filtered", exist_ok=True) 
 
-#Unfiltered spectrum
+#Unfiltered spectrum 
 """ for i in range(len(speeds)):
     plt.plot(freq_list[i], X_mag_list[i], label = "0."+speeds[i]+" m/s")
 plt.legend()    
@@ -214,6 +176,10 @@ print(freq_dominant_list)
 print("Dominant frequency filtered:")
 for i in range(len(speeds)):
     print(freq_dominant_filtered_list[i]) 
+print("Second dominant frequency filtered:")
+for i in range(len(speeds)):
+    print(freq_second_dominant_filtered_list[i]) 
+
 
 #Dominant frequencies vs velocity
 """ plt.plot(vel, freq_dominant_filtered_list)   
