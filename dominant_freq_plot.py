@@ -125,16 +125,16 @@ os.makedirs("Spectrums_comparison_Ca_Num", exist_ok=True)
 
 
 plt.figure(figsize=(8, 6))
-plt.plot(S_W_Ca[3:], S_W, ".--", label="Experimental") 
-#plt.plot(S_M_Ca[-3:-1], S_M_second_top, "D", label="Experiemntal second frequency top") 
-plt.plot(S_W_Ca[3:], S_W_num, ".-", label="Numerical")    
+plt.plot(S_A_Ca[3:], S_A, ".--", label="Experimental", color="orange") 
+#plt.plot(S_J_Ca[-3:], S_J_second_top, "D", label="Experiemntal second frequency top", color="green") 
+plt.plot(S_A_Ca[3:], S_A_num, ".-", label="Numerical", color="blue")    
 plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0)) 
-plt.ylabel('Frequency (Hz)', fontsize=14) 
-plt.xlabel('Ca', fontsize=14)
+plt.ylabel('Frequency [Hz]', fontsize=14) 
+plt.xlabel('Ca [-]', fontsize=14)
 plt.legend()
 plt.grid()
 
-filepath = os.path.join("Spectrums_comparison_Ca_Num", "dominant frequency_S_W.png")
+filepath = os.path.join("Spectrums_comparison_Ca_Num", "dominant frequency_S_A.png")
 plt.savefig(filepath, dpi=300)
 plt.close() 
 
