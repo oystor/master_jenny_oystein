@@ -127,7 +127,8 @@ lengths = np.array([29.04, 42.60, 50.32, 50.32]) * 10**(-2) # m
 widths = np.array([4.6, 6.3, 7.28, 7.28]) * 10**(-2) # m
 ds = np.array([0.00084867, 0.00095333, 0.00090267, 0.00090267])
 d_wavy = 0.00144867 # m (thickness for wavy model)
-E = 1.26 * 10**6 # Pa
+E_single = 1.26 * 10**6 # Pa
+E_cluster = E_single/2
 t_c = 1.86 # cluster thickness parameter
 
 U_list = [0.03, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
@@ -188,11 +189,11 @@ for config in config_list:
             #Calculate Cd_bulk and Cauchy number for each run
             if config=="S":
                 Cd_model.append(Cd_bulk(lengths[m], widths[m], U_list[i], np.mean(Fx)-Fx_zero))
-                Ca_model.append(cauchy_number(lengths[m], widths[m], ds[m], U_list[i], E))
+                Ca_model.append(cauchy_number(lengths[m], widths[m], ds[m], U_list[i], E_single))
             else: 
                 # d = d*1.86 for cluster configuration and w = 3*w
                 Cd_model.append(Cd_bulk(lengths[m], 3*widths[m], U_list[i], np.mean(Fx)-Fx_zero))
-                Ca_model.append(cauchy_number(lengths[m], 3*widths[m], ds[m]*1.86, U_list[i], E/2))
+                Ca_model.append(cauchy_number(lengths[m], 3*widths[m], ds[m]*1.86, U_list[i], E_cluster))
             
         if config=="S":
             FxS_list.append(Fx_model)
@@ -259,15 +260,15 @@ for i in range(len(model_list)):
 # NUMERICAL LOADS
 ###############################################################################
 
-""" config = "S" # S/C
+config = "C" # S/C
 #model = "A" # A/M/J/W
-model_list = ["J"]
+model_list = ["A"]
 #speed = "7" # 3=0.3m/s
 velocities = ["03", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 CMs = ["0035", "0456", "0489","005","01", "0102","014","015", "02", "0253","0293", "03", "04", "06", "08", "10"]
 CM_choice = 9
-CM_list = ["02", "025", "03"]
-
+CM_list = ["073", "093", "123"]
+"""
 FxS_num = []
 for CM in CM_list:
     for model in model_list:
@@ -294,7 +295,7 @@ for CM in CM_list:
             time, loadx, loadz, loadx_mean = get_numerical_loads(filename)
             Fx_mean_model_list.append(loadx_mean)
         FxC_num.append(Fx_mean_model_list)    
-"""
+
 #####################################################ß##########################
 # PLOTS
 ###############################################################################
@@ -335,13 +336,13 @@ plt.savefig(filepath, dpi=300)
 """
 #subplots for single configuration
 plt.figure(figsize=(10, 7)) 
-plt.plot(Cas_S_A_origo, FxS_list[0], 'D', color='blue', label="Model: April, Experimental")
-plt.plot(Cas_S_A, FxS_num[0], ls="dashed", marker=".", color='orange', label="Model: April, Numerical with CM: 0.128")
-plt.plot(Cas_S_A, FxS_num[1], ls="dashed", marker=".", color='green', label="Model: April, Numerical with CM: 0.228")
+plt.plot(0, 0, 'black', marker='o', label="Origo")
+plt.plot(Cas_S_A_origo, FxS_list[0], 'D', color='orange', label="Model: April, Experimental")
+plt.plot(Cas_S_A, curve_fit_S_list[0], '--', color='orange', label="Curve fit experimental data April")
+plt.plot(Cas_S_A, FxS_num[0], ls="dashed", marker=".", color='green', label="Model: April, Numerical with CM: 0.128")
+plt.plot(Cas_S_A, FxS_num[1], ls="dashed", marker=".", color='blue', label="Model: April, Numerical with CM: 0.228")
 plt.plot(Cas_S_A, FxS_num[2], ls="dashed", marker=".", color='red', label="Model: April, Numerical with CM: 0.274")
 print("Best fit index of CM_list:", best_fit(FxS_list[0], FxS_num[0], FxS_num[1], FxS_num[2]))
-plt.plot(Cas_S_A, curve_fit_S_list[0], '--', color='blue', label="Curve fit experimental data April")
-plt.plot(0, 0, 'black', marker='o', label="Origo")
 plt.legend()
 plt.grid()
 plt.xlabel("Cauchy number [-]")
@@ -353,16 +354,15 @@ plt.close()
 """
 """
 plt.figure(figsize=(10, 7)) 
+plt.plot(0, 0, 'black', marker='o', label="Origo")
 plt.plot(Cas_S_M_origo, FxS_list[1], 'D', color='orange', label="Model: May, Experimental")
+plt.plot(Cas_S_M, curve_fit_S_list[1], '--', color='orange', label="Curve fit experimental data May")
 plt.plot(Cas_S_M, FxS_num[0], ls="dashed", marker=".", color='blue', label="Model: May, Numerical with CM: 0.144")
 plt.plot(Cas_S_M, FxS_num[1], ls="dashed", marker=".", color='green', label="Model: May, Numerical with CM: 0.244")
 plt.plot(Cas_S_M, FxS_num[2], ls="dashed", marker=".", color='red', label="Model: May, Numerical with CM: 0.293")
 print("Best fit index of CM_list:", best_fit(FxS_list[1], FxS_num[0], FxS_num[1], FxS_num[2]))
-plt.plot(Cas_S_M, curve_fit_S_list[1], '--', color='orange', label="Curve fit experimental data May")
-plt.plot(0, 0, 'black', marker='o', label="Origo")
 plt.legend()
 plt.grid()
-plt.title("Single blade - May with C_M: " + CM_list[0])
 plt.xlabel("Cauchy number [-]")
 plt.ylabel("Drag force [N]")
 savename = "Fx_Mean_Single_May_CM_" + CM_list[0] + "_" + CM_list[1] + "_" + CM_list[2] + ".png"
@@ -372,19 +372,18 @@ plt.close()
 """
 """
 plt.figure(figsize=(10, 7)) 
-plt.plot(Cas_S_J_origo, FxS_list[2], 'D', color='blue', label="Model: June Experimental")
-plt.plot(Cas_S_J, FxS_num[0], ls='dashed', marker=".", color='orange', label="Model: June Numerical with CM: 0.2")
+plt.plot(0, 0, 'black', marker='o', label="Origo")
+plt.plot(Cas_S_J_origo, FxS_list[2], 'D', color='orange', label="Model: June Experimental")
+plt.plot(Cas_S_J, curve_fit_S_list[2], '--', color='orange', label="Curve fit experimental data June")
+plt.plot(Cas_S_J, FxS_num[0], ls='dashed', marker=".", color='blue', label="Model: June Numerical with CM: 0.2")
 plt.plot(Cas_S_J, FxS_num[1], ls='dashed', marker=".", color='green', label="Model: June Numerical with CM: 0.25")
 plt.plot(Cas_S_J, FxS_num[2], ls='dashed', marker=".", color='red', label="Model: June Numerical with CM: 0.3")
-plt.plot(Cas_S_J, curve_fit_S_list[2], '--', color='blue', label="Curve fit experimental data June")
 print("Best fit index of CM_list:", best_fit(FxS_list[2], FxS_num[0], FxS_num[1], FxS_num[2]))
-plt.plot(0, 0, 'black', marker='o', label="Origo")
 plt.legend()
 plt.grid()
-plt.title("Single blade - June with C_M: " + CM_list[0])
 plt.xlabel("Cauchy number [-]")
 plt.ylabel("Drag force [N]")
-savename = "Fx_Mean_Single_June_CM_" + CM_list[0] + ".png"
+savename = "Fx_Mean_Single_June_CM_" + CM_list[0] + "_" + CM_list[1] + "_" + CM_list[2] + ".png"
 filepath = os.path.join("Plots", savename)
 plt.savefig(filepath, dpi=300)
 plt.close()
@@ -408,13 +407,12 @@ plt.close()"""
 """
 #subplots for single configuration
 plt.figure(figsize=(10, 7)) 
-plt.plot(Cas_S_W_origo, FxS_list[3], 'D', color='blue', label="Model: Wavy, Experimental")
-plt.plot(Cas_S_W, FxS_num[0], ls="dashed", marker=".", color='orange', label="Model: Wavy, Numerical")
-plt.plot(Cas_S_W, curve_fit_S_list[3], '--', color='blue', label="Curve fit Wavy")
 plt.plot(0, 0, 'black', marker='o', label="Origo")
+plt.plot(Cas_S_W_origo, FxS_list[3], 'D', color='orange', label="Model: Wavy, Experimental")
+plt.plot(Cas_S_W, curve_fit_S_list[3], '--', color='orange', label="Curve fit experimental data Wavy")
+plt.plot(Cas_S_W, FxS_num[0], ls="dashed", marker=".", color='blue', label="Model: Wavy, Numerical with CM: 0.25")
 plt.legend()
 plt.grid()
-plt.title("Single blade - Wavy, with C_M: " + CMs[CM_choice])
 plt.xlabel("Cauchy number [-]")
 plt.ylabel("Drag force [N]")
 savename = "Fx_Mean_Single_Wavy_CM_" + CMs[CM_choice] + ".png"
@@ -426,12 +424,13 @@ plt.close()
 """
 #Plot for finding the best CM for Single_june
 plt.figure(figsize=(10, 7)) 
-plt.plot(Cas_S_J_origo, FxS_list[2], 'D', color='orange', label="June Experimental")
-plt.plot(Cas_S_J, FxS_num[0], ls="dashed", marker=".", color='red', label="June Numerical with CM: 0.2")
-plt.plot(Cas_S_J, FxS_num[1], ls="dashed", marker=".", color='green', label="June Numerical with CM: 0.25")
-plt.plot(Cas_S_J, FxS_num[2], ls="dashed", marker=".", color='blue', label="June Numerical with CM: 0.3")
-plt.plot(Cas_S_J, curve_fit_S_list[2], '--', color='orange', label="Curve fit experimental data June")
 plt.plot(0, 0, 'black', marker='o', label="Origo")
+plt.plot(Cas_S_J_origo, FxS_list[2], 'D', color='orange', label="Model: June, Experimental")
+plt.plot(Cas_S_J, curve_fit_S_list[2], '--', color='orange', label="Curve fit experimental data June")
+plt.plot(Cas_S_J, FxS_num[0], ls="dashed", marker=".", color='red', label="Model: June, Numerical with CM: 0.2")
+plt.plot(Cas_S_J, FxS_num[1], ls="dashed", marker=".", color='green', label="Model: June, Numerical with CM: 0.25")
+plt.plot(Cas_S_J, FxS_num[2], ls="dashed", marker=".", color='blue', label="Model: June, Numerical with CM: 0.3")
+print("Best fit index of CM_list:", best_fit(FxS_list[2], FxS_num[0], FxS_num[1], FxS_num[2], verbose=True))
 plt.legend()
 plt.grid()
 plt.xlabel("Cauchy number [-]")
@@ -440,72 +439,61 @@ savename = "Fx_Mean_Single_June_CMs_" + CM_list[0] + "_" + CM_list[1] + "_" + CM
 filepath = os.path.join("Plots", savename)
 plt.savefig(filepath, dpi=300)
 plt.close()
+"""
 
-"""
-""" plt.figure(figsize=(10, 7)) 
-plt.plot(U_list_origo, FxS_list[3], 'D', color='red', label="Wavy Experimental")
-plt.plot(U_list, FxS_num[0], ls="dashed", marker=".", color='red', label="Wavy Numerical")
-#plt.plot(U_list, curve_fit_list[3], '--', color='red', label="Curve fit Wavy")
-plt.plot(0, 0, 'black', marker='o', label="Origo")
-plt.legend()
-plt.grid()
-plt.title("Single blade - Wavy with C_M: " + CMs[CM_choice])
-plt.xlabel("Flow velocity [m/s]")
-plt.ylabel("Drag force [N]")
-savename = "Fx_Mean_Single_Wavy_CM_" + CMs[CM_choice] + ".png"
-filepath = os.path.join("Plots", savename)
-plt.savefig(filepath, dpi=300)
-plt.close()  """
-"""
+
  #subplots for cluster configuration
 plt.figure(figsize=(10, 7)) 
-plt.plot(Cas_C_A_origo, FxC_list[0], 'D', color='blue', label="Model: April, Experimental")
-plt.plot(Cas_C_A, FxC_num[0], ls='dashed', marker=".", color='orange', label="Model: April, Numerical")
-plt.plot(Cas_C_A, curve_fit_C_list[0], '--', color='blue', label="Curve fit experimental data April")
 plt.plot(0, 0, 'black', marker='o', label="Origo")
+plt.plot(Cas_C_A_origo, FxC_list[0], 'D', color='orange', label="Model: Cluster, April, Experimental")
+plt.plot(Cas_C_A, curve_fit_C_list[0], '--', color='orange', label="Curve fit experimental data April")
+plt.plot(Cas_C_A, FxC_num[0], ls='dashed', marker=".", color='red', label="Model: Cluster, April, Numerical with CM: 0.073")
+plt.plot(Cas_C_A, FxC_num[1], ls='dashed', marker=".", color='blue', label="Model: Cluster, April, Numerical with CM: 0.093")
+plt.plot(Cas_C_A, FxC_num[2], ls='dashed', marker=".", color='green', label="Model: Cluster, April, Numerical with CM: 0.123")
 plt.legend()
 plt.grid()
-plt.title("Cluster - April, with C_M: " + CMs[CM_choice])
 plt.xlabel("Cauchy number [-]")
 plt.ylabel("Drag force [N]")
-savename = "Fx_Mean_Cluster_April_CM_" + CMs[CM_choice] + ".png"
+savename = "Fx_Mean_Cluster_April_CM_" + CM_list[0] + "_" + CM_list[1] + "_" + CM_list[2] + ".png"
 filepath = os.path.join("Plots", savename)
 plt.savefig(filepath, dpi=600)
 plt.close() 
-"""
+
 """
 plt.figure(figsize=(10, 7)) 
-plt.plot(Cas_C_M_origo, FxC_list[1], 'D', color='orange', label="Model: May, Experimental")
-plt.plot(Cas_C_M, FxC_num[0], ls='dashed', marker=".", color='blue', label="Model: May, Numerical")
-plt.plot(Cas_C_M, curve_fit_C_list[1], '--', color='orange', label="Curve fit May")
 plt.plot(0, 0, 'black', marker='o', label="Origo")
+plt.plot(Cas_C_M_origo, FxC_list[1], 'D', color='orange', label="Model: Cluster, May, Experimental")
+plt.plot(Cas_C_M, curve_fit_C_list[1], '--', color='orange', label="Curve fit experimental data May")
+plt.plot(Cas_C_M, FxC_num[0], ls='dashed', marker=".", color='blue', label="Model: Cluster, May, Numerical with CM: 0.058")
+plt.plot(Cas_C_M, FxC_num[1], ls='dashed', marker=".", color='green', label="Model: Cluster, May, Numerical with CM: 0.078")
 plt.legend()
 plt.grid()
-plt.title("Cluster - May, with C_M: " + CMs[CM_choice])
 plt.xlabel("Cauchy number [-]")
 plt.ylabel("Drag force [N]")
-savename = "Fx_Mean_Cluster_May_CM_" + CMs[CM_choice] + ".png"
+savename = "Fx_Mean_Cluster_May_CM_" + CM_list[0] + ".png"
 filepath = os.path.join("Plots", savename)
 plt.savefig(filepath, dpi=300)
 plt.close
 """
 """
 plt.figure(figsize=(10, 7)) 
-plt.plot(Cas_C_J_origo, FxC_list[2], 'D', color='green', label="Model: June, Experimental")
-plt.plot(Cas_C_J, FxC_num[0], ls='dashed', marker=".", color='red', label="Model: June, Numerical, CM: " + CM_list[0])
-plt.plot(Cas_C_J, FxC_num[1], ls='dashed', marker=".", color='blue', label="Model: June, Numerical, CM: " + CM_list[1])
-plt.plot(Cas_C_J, curve_fit_C_list[2], '--', color='green', label="Curve fit June")
 plt.plot(0, 0, 'black', marker='o', label="Origo")
+plt.plot(Cas_C_J_origo, FxC_list[2], 'D', color='orange', label="Model: Cluster, June, Experimental")
+plt.plot(Cas_C_J, curve_fit_C_list[2], '--', color='orange', label="Curve fit experimental data June")
+plt.plot(Cas_C_J, FxC_num[0], ls='dashed', marker=".", color='green', label="Model: Cluster, June, Numerical, CM: 0.08")
+plt.plot(Cas_C_J, FxC_num[1], ls='dashed', marker=".", color='red', label="Model: Cluster, June, Numerical, CM: 0.1")
+plt.plot(Cas_C_J, FxC_num[2], ls='dashed', marker=".", color='blue', label="Model: Cluster, June, Numerical, CM: 0.15")
+print("Best fit index of CM_list:", best_fit(FxS_list[0], FxC_num[0], FxC_num[1], FxC_num[2], verbose=True))
 plt.legend()
 plt.grid()
-plt.title("Cluster - June, with C_Ms: " + CM_list[0] + ", " + CM_list[1])
 plt.xlabel("Cauchy number [-]")
 plt.ylabel("Drag force [N]")
-savename = "Fx_Mean_Cluster_June_CM_" + CMs[CM_choice] + ".png"
+savename = "Fx_Mean_Cluster_June_CM_" + CM_list[0] + "_" + CM_list[1] + "_" + CM_list[2] + ".png"
 filepath = os.path.join("Plots", savename)
 plt.savefig(filepath, dpi=300)
 plt.close() 
-""""""
+"""
+"""
 plt.figure(figsize=(10, 7)) 
 plt.plot(Cas_C_J_origo, FxC_list[2], 'D', color='orange', label="June Experimental")
 plt.plot(Cas_C_J, FxC_num[0], ls="dashed", marker=".", color='red', label="June Numerical with CM: 0.15")
@@ -521,12 +509,12 @@ filepath = os.path.join("Plots", savename)
 plt.savefig(filepath, dpi=300)
 plt.close()"""
 """
-plt.figure(figsize=(10, 7)) 
+plt.figure(figsize=(10, 7))
+plt.plot(0, 0, 'black', marker='o', label="Origo")
 plt.plot(Cas_C_W_origo, FxC_list[3], 'D', color='orange', label="Model: Cluster, Wavy Experimental")
+plt.plot(Cas_C_W, curve_fit_C_list[3], ls='dashed', color='orange', label="Curve fit experimental data Wavy")
 plt.plot(Cas_C_W, FxC_num[0], ls="dashed", marker=".", color='red', label="Model: Cluster, Wavy Numerical with CM: 0.1")
 plt.plot(Cas_C_W, FxC_num[1], ls="dashed", marker=".", color='green', label="Model: Cluster, Wavy Numerical with CM: 0.14")
-plt.plot(Cas_C_W, curve_fit_C_list[3], ls='dashed', color='orange', label="Curve fit experimental data Wavy")
-plt.plot(0, 0, 'black', marker='o', label="Origo")
 plt.legend()
 plt.grid()
 plt.xlabel("Cauchy number [-]")
